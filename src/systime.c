@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <sys/timeb.h>
 #include <sys/types.h>
-#include "systime.h"
+#include "../include/systime.h"
 
 //Get the system time, accurate to seconds
 double get_system_time()

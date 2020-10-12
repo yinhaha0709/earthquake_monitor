@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include "arrayop.h"
+#include "../include/arrayop.h"
 
 //Pre allocate memory to 2D array
 double** allocation_memory_double(int row, int cow)

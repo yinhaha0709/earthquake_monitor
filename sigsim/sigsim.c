@@ -5,8 +5,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <time.h>
-#include "systime.h"
-#include "arrayop.h"
+#include "../include/systime.h"
+#include "../include/arrayop.h"
 
 //Generating virtual signals
 double random_sig(double a)
