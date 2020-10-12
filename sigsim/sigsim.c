@@ -45,7 +45,7 @@ int main(int argc, char* argv[])
     //printf("%f", a);
 
     FILE *fp = NULL;
-    fp = fopen("/home/zncg/data/wav_data1.txt", "w+");
+    fp = fopen("../data/wav_data1.txt", "w+");
 
     if(fp == NULL){
         printf("file open error!");
@@ -58,7 +58,7 @@ int main(int argc, char* argv[])
     i = 0, j = 0;
     
     start_time = get_system_time3f();
-    printf("%f", start_time);
+    //printf("%f", start_time);
 
     while(i < sec)
     {
@@ -80,7 +80,7 @@ int main(int argc, char* argv[])
     }
 
     start_time = get_system_time3f();
-    printf("%f", start_time);
+    //printf("%f", start_time);
     fclose(fp);
 
     free_memory_double(c, sec);
