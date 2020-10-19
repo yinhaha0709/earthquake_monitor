@@ -38,16 +38,67 @@ void mysqldb_insert(MYSQL *mysql, double timestrap, double value)
         //printf("\nInsert sucessfully!\n");
     }
     
-}  
+}
+
+void mysqldb_insert_cal(MYSQL *mysql, char *table_name, char *field_name, double value)
+{  
+    int t;  
+    char *head = "INSERT INTO ";  
+    char query[120];
+    char *left = "(";  
+    char *right = ") ";  
+    char *values = "VALUES";  
+    char message[100] = {0};  
+
+    sprintf(message, "%f", value);
+
+    /* 拼接sql命令 */  
+    sprintf(query, "%s%s%s%s%s%s%s%s%s", head, table_name, left, field_name, right, values, left, message, right);
+    //printf("%s\n", query);  
+
+    t = mysql_real_query(mysql, query, strlen(query));
+    if (t) {  
+        printf("Failed to query: %s\n", mysql_error(mysql));  
+    } 
+    else {
+        //printf("\nInsert sucessfully!\n");
+    }
+    
+}
+
+void mysqldb_alter(MYSQL *mysql, char *table_name, char *field_name)
+{
+    int t;
+    char query1[120], query2[120];
+    sprintf(query1, "ALTER TABLE %s DROP %s", table_name, field_name);
+    t = mysql_real_query(mysql, query1, strlen(query1));
+
+    if (t) {  
+        printf("Failed to alter1: %s\n", mysql_error(mysql));  
+    } 
+    else {
+        //printf("\nalter1 sucessfully!\n");
+    }
+
+    sprintf(query2, "ALTER TABLE %s add %s int(11) primary key auto_increment first", table_name, field_name);
+    t = mysql_real_query(mysql, query2, strlen(query2));
+
+    if (t) {  
+        printf("Failed to alter2: %s\n", mysql_error(mysql));  
+    } 
+    else {
+        //printf("\nalter2 sucessfully!\n");
+    }
+}
 
 /* 删除数据 */
-void mysqldb_delete(MYSQL *mysql, char *field_name, char *num)
+void mysqldb_delete(MYSQL *mysql, char *table_name, char *field_name, char *num)
 {  
     int t;
     char *head = "DELETE FROM ";  
     char query[120];  
 
-    sprintf(query, "%s%s where 1=1 order by %s limit %s", head, TABLE_NAME1, field_name, num);
+    sprintf(query, "%s%s where 1=1 order by %s limit %s", head, table_name, field_name, num);
     //printf("%s\n", query);
 
     t = mysql_real_query(mysql, query, strlen(query));
@@ -67,6 +118,24 @@ void mysqldb_update(MYSQL *mysql, char *field_name, int value)
     char query[120];
 
     sprintf(query, "%s%s SET %s=%d WHERE id=1", head, TABLE_NAME2, field_name, value);
+    //printf("%s\n", query);
+
+    t = mysql_real_query(mysql, query, strlen(query));
+    if (t) {  
+        printf("Failed to update: %s\n", mysql_error(mysql));  
+        return;
+    }
+    //printf("\nUpdate data sucessfully!\n");
+}
+
+//updata double data in table2
+void mysqldb_update_double(MYSQL *mysql, char *field_name, double value, int id)
+{  
+    int t;
+    char *head = "UPDATE ";
+    char query[120];
+
+    sprintf(query, "%s%s SET %s=%f WHERE id=1", head, TABLE_NAME2, field_name, value, id);
     //printf("%s\n", query);
 
     t = mysql_real_query(mysql, query, strlen(query));

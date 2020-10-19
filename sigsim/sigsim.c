@@ -69,7 +69,7 @@ int main(int argc, char* argv[])
     start_time = get_system_time3f();
     printf("row in data start time: %f\n", start_time);
 
-    mysql1 = mysql_init(NULL);           
+    /*mysql1 = mysql_init(NULL);           
     if (!mysql1) {
         printf("\nMysql init failed.\n");
     }
@@ -81,7 +81,9 @@ int main(int argc, char* argv[])
 
     mysqldb_update(mysql1, MESSAGE_INT, data_row_num_init);
     pthread_mutex_unlock(&mutex_row_check);
-    close_connection(mysql1);
+    close_connection(mysql1);*/
+
+    row_check(argc);
     
     start_time = get_system_time3f();
     start_time1 = start_time;

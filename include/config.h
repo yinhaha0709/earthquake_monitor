@@ -8,7 +8,11 @@
 #define DB_NAME "workbench_test"
 #define TABLE_NAME1 "data_test"
 #define TABLE_NAME2 "data_message"
+#define TABLE_NAME3 "data_min"
+#define TABLE_NAME4 "data_max"
+#define TABLE_NAME5 "data_ave"
 #define MESSAGE_INT "message_int_content"
+
 int row_num = 0;
 double **c;
 pthread_mutex_t mutex, mutex_row_check;
