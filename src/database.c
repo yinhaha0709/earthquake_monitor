@@ -1,3 +1,5 @@
+#include <stdio.h>
+#include <string.h>
 #include <mysql/mysql.h>
 #include "../include/config.h"
 #include "../include/database.h"
@@ -50,7 +52,7 @@ void mysqldb_insert_cal(MYSQL *mysql, char *table_name, char *field_name, char *
     char *values = "VALUES";  
     char message[100] = {0};  
 
-    sprintf(message, "%f", value);
+    sprintf(message, "%s", value);
 
     /* 拼接sql命令 */  
     sprintf(query, "%s%s%s%s%s%s%s%s%s", head, table_name, left, field_name, right, values, left, message, right);
@@ -129,13 +131,14 @@ void mysqldb_update(MYSQL *mysql, char *field_name, int value)
 }
 
 //updata double data in table2
+/*
 void mysqldb_update_double(MYSQL *mysql, char *field_name, double value, int id)
 {  
     int t;
     char *head = "UPDATE ";
     char query[120];
 
-    sprintf(query, "%s%s SET %s=%f WHERE id=1", head, TABLE_NAME2, field_name, value, id);
+    sprintf(query, "%s%s SET %s=%f WHERE id=%d", head, TABLE_NAME2, field_name, value, id);
     //printf("%s\n", query);
 
     t = mysql_real_query(mysql, query, strlen(query));
@@ -145,13 +148,15 @@ void mysqldb_update_double(MYSQL *mysql, char *field_name, double value, int id)
     }
     //printf("\nUpdate data sucessfully!\n");
 }
-
+*/
 /* 查询数据 */
-void mysqldb_query(MYSQL *mysql, char *content, char *table_name, char *name, char *value)  
+MYSQL_ROW mysqldb_query(MYSQL *mysql, char *content, char *table_name, char *name, char *value)  
 {  
     int t;
     char *head = "SELECT  ";
     char query[120] = {0};
+    MYSQL_RES *res = NULL;
+    MYSQL_ROW row; 
 
     sprintf(query, "%s%s FROM %s WHERE %s=%s", head, content, table_name, name, value);
 
@@ -165,10 +170,9 @@ void mysqldb_query(MYSQL *mysql, char *content, char *table_name, char *name, ch
 
     res = mysql_store_result(mysql);
     row = mysql_fetch_row(res);
-
-    //printf("%s\n", row[0]);  
     
     mysql_free_result(res);
+    return row;
 }  
 
 /* 断开mysql连接 */ 

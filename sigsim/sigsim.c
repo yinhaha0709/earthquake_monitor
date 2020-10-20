@@ -3,8 +3,11 @@
 */
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 #include <time.h>
+#include <mysql/mysql.h>
+#include <pthread.h>
 #include "../include/systime.h"
 #include "../include/arrayop.h"
 #include "../include/config.h"
@@ -12,6 +15,9 @@
 #include "../include/savdata.h"
 #include "../include/checkrow.h"
 #include "../include/datacharacteric.h"
+
+extern double **c;
+extern pthread_mutex_t mutex, mutex_row_check;
 
 //Generating virtual signals
 double random_sig(double a)
@@ -36,12 +42,14 @@ double random_sig(double a)
 //Main function of generating virtual signal according to time
 int main(int argc, char* argv[])
 {
+    int row_num;
     pthread_t id_t1, id_t2, id_t3;
     double a, point_per_sec, time_temp1, time_temp2, time_temp3, now_time3f;
     int b,  j, k, data_row_num_init;
+    int simple_rate = SIMPLE_RATE;
     MYSQL *mysql1;
+    MYSQL_ROW row3;
  //   int sec = 10;
-
 
     c = allocation_memory_double(10, 2);
 
@@ -77,14 +85,14 @@ int main(int argc, char* argv[])
 
     mysqldb_connect(mysql1);
     pthread_mutex_lock(&mutex_row_check);
-    mysqldb_query(mysql1, "count(*)", TABLE_NAME1, "1", "1");
-    data_row_num_init = atoi(row[0]);
+    row3 = mysqldb_query(mysql1, "count(*)", TABLE_NAME1, "1", "1");
+    data_row_num_init = atoi(row3[0]);
 
     mysqldb_update(mysql1, MESSAGE_INT, data_row_num_init);
     pthread_mutex_unlock(&mutex_row_check);
     close_connection(mysql1);
 
-    row_check(argc);
+    row_check();
     
     time_temp1 = get_system_time3f();
     time_temp2 = time_temp1;

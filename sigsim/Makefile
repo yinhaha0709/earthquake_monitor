@@ -1,14 +1,22 @@
+bin = ../bin
 inc = ../include
+lib = ../lib
 src = ../src
-objects = sigsim.o $(src)/arrayop.o $(src)/systime.o
+man = ../mandata
+sim = ../sigsim
 
-sigsim: $(objects)
-	cc -lm -o sigsim $(objects)
+objects_sim = $(lib)/sigsim.o $(lib)/arrayop.o $(lib)/systime.o $(lib)/checkrow.o $(lib)/database.o \
+	$(lib)/datacharacteric.o $(lib)/savdata.o $(lib)/searchaverage.o $(lib)/searchmax.o $(lib)/searchmin.o
 
-sigsim.o: $(inc)/systime.h $(inc)/arrayop.h
+$(bin)/sigsim: $(objects_sim)
+	cc -lmysqlclient -D_REENTRANT -lpthread -o $(bin)/sigsim $(objects_sim)
 
-include $(src)/Makefile
+$(lib)/sigsim.o: $(inc)/systime.h $(inc)/arrayop.h $(inc)/config.h $(inc)/database.h \
+			$(inc)/savdata.h $(inc)/checkrow.h $(inc)/datacharacteric.h
+	cc -o $(lib)/sigsim.o -D_REENTRANT -lmysqlclient -lpthread -c sigsim.c
+
+include $(man)/Makefile
 
 .PHONY: clean
 clean:
-	rm sigsim $(objects)
+	rm sigsim $(objects_sim)

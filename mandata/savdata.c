@@ -1,8 +1,14 @@
+#include <stdio.h>
 #include <mysql/mysql.h>
 #include <pthread.h>
 #include "../include/config.h"
 #include "../include/savdata.h"
 #include "../include/database.h"
+#include "../include/systime.h"
+#include "../include/arrayop.h"
+
+extern double **c;
+extern pthread_mutex_t mutex, mutex_row_check;
 
 void * data_save(void * arg)
 {
@@ -11,6 +17,7 @@ void * data_save(void * arg)
     int data_row_num = 0;    
     double **d = allocation_memory_double(10,2);
     MYSQL *mysql;
+    MYSQL_ROW row2;
 
     runtime = get_system_time3f();
     printf("data save pthread start time: %f\n", runtime);
@@ -30,8 +37,8 @@ void * data_save(void * arg)
     pthread_mutex_unlock(&mutex);
 
     pthread_mutex_lock(&mutex_row_check);
-    mysqldb_query(mysql, MESSAGE_INT, TABLE_NAME2, "id", "1");
-    data_row_num = atoi(row[0]);
+    row2 = mysqldb_query(mysql, MESSAGE_INT, TABLE_NAME2, "id", "1");
+    data_row_num = atoi(row2[0]);
     pthread_mutex_unlock(&mutex_row_check);
 
     if( data_row_num >= 24000){

@@ -13,11 +13,12 @@ void data_cal_change(int i, int j, int k)
 {
     MYSQL *mysql;
     double t, min_array[30], max_array[30], ave_array[60];
-    float min_1s, max_1s, min_5s, max_5s, min_30s, max_30s, ave_3s, ave_60s, ave_ratio, sensor_status = 3;
+    float min_1s, max_1s, min_5s, max_5s, min_30s, max_30s, ave_3s, ave_60s, ave_ratio, sensor_status;
+    sensor_status = SENSOR_STATUS;
     int x = 0;
     char field_message[200], value_message[120];
-
-    char tunnel = "1";
+    char tunnel = TUNNEL;
+    MYSQL_ROW row;
 
     mysql = mysql_init(NULL);
     if (!mysql) {
@@ -25,15 +26,15 @@ void data_cal_change(int i, int j, int k)
     }
     mysqldb_connect(mysql);
 
-    mysqldb_query(mysql, "min_data_value", TABLE_NAME3, "1", "1 order by id desc limit 30");
+    row = mysqldb_query(mysql, "min_data_value", TABLE_NAME3, "1", "1 order by id desc limit 30");
     for(x=0; x<i; x++)
         min_array[x] = atof(row[x]);
 
-    mysqldb_query(mysql, "max_data_value", TABLE_NAME4, "1", "1 order by id desc limit 30");
+    row = mysqldb_query(mysql, "max_data_value", TABLE_NAME4, "1", "1 order by id desc limit 30");
     for(x=0; x<j;x++)
         max_array[x] = atof(row[x]);
 
-    mysqldb_query(mysql, "ave_data_value", TABLE_NAME5, "1", "1 order by id desc limit 60");
+    row = mysqldb_query(mysql, "ave_data_value", TABLE_NAME5, "1", "1 order by id desc limit 60");
     for(x=0; x<k; x++)
         ave_array[x] = atof(row[x]);
 
@@ -87,13 +88,14 @@ void data_cal_change(int i, int j, int k)
     t = get_system_time();
 
     strcpy(field_message, "timestrap, tunnel_ID, max_value_1s, min_value_1s, max_value_5s, min_value_5s, max_value_30s, min_value_30s, ave_value_3s, ave_value_60s, ave_ratio, sensor_status");
-    sprintf(value_message, "%f, %s, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f", t, tunnel, max_1s, min_1s, max_5s, min_5s, max_30s, min_30s, ave_3s, ave_60s, ave_ratio, sensor_status);
+    sprintf(value_message, "%f, %c, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f", t, tunnel, max_1s, min_1s, max_5s, min_5s, max_30s, min_30s, ave_3s, ave_60s, ave_ratio, sensor_status);
     mysqldb_insert_cal(mysql, TABLE_NAME6, field_message, value_message);
 }
 
 void data_calculation_operation()
 {
     MYSQL *mysql;
+    MYSQL_ROW row;
     double e[200], f[1000], g[6000], max, min,  ave;
     int i = 0, j = 0, k = 0;
     char message1[20], message2[20], message3[20];
@@ -104,7 +106,7 @@ void data_calculation_operation()
     }
     mysqldb_connect(mysql);
 
-    mysqldb_query(mysql, "value", TABLE_NAME1, "1", "1 order by timestrap desc limit 200");
+    row = mysqldb_query(mysql, "value", TABLE_NAME1, "1", "1 order by timestrap desc limit 200");
     for (i=0; i<200; i++)
         e[i] = atof(row[i]);
     
@@ -115,7 +117,7 @@ void data_calculation_operation()
     sprintf(message2, "%f", max);
     sprintf(message3, "%f", ave);
 
-    mysqldb_query(mysql, "count(*)", TABLE_NAME3, "1", "1");
+    row = mysqldb_query(mysql, "count(*)", TABLE_NAME3, "1", "1");
     i = atoi(row[0]);
     if(i >= 30){
         mysqldb_delete(mysql, TABLE_NAME3, "min_data_value asc", "1");
@@ -123,7 +125,7 @@ void data_calculation_operation()
     mysqldb_insert_cal(mysql, TABLE_NAME3, "min_data_value", message1);
     mysqldb_alter(mysql, TABLE_NAME3, "id");
 
-    mysqldb_query(mysql, "count(*)", TABLE_NAME4, "1", "1");
+    row = mysqldb_query(mysql, "count(*)", TABLE_NAME4, "1", "1");
     j = atoi(row[0]);
     if(j >= 30){
         mysqldb_delete(mysql, TABLE_NAME4, "max_data_value asc", "1");
@@ -131,7 +133,7 @@ void data_calculation_operation()
     mysqldb_insert_cal(mysql, TABLE_NAME4, "max_data_value", message2);
     mysqldb_alter(mysql, TABLE_NAME4, "id");
 
-    mysqldb_query(mysql, "count(*)", TABLE_NAME5, "1", "1");
+    row = mysqldb_query(mysql, "count(*)", TABLE_NAME5, "1", "1");
     k = atoi(row[0]);
     if(k >= 60){
         mysqldb_delete(mysql, TABLE_NAME5, "ave_data_value asc", "1");

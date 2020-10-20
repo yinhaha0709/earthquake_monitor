@@ -1,3 +1,6 @@
+#ifndef __CONFIG_H__
+#define __CONFIG_H__
+
 #include <mysql/mysql.h>
 #include <pthread.h>
 
@@ -13,10 +16,8 @@
 #define TABLE_NAME5 "data_ave"
 #define TABLE_NAME6 "data_send"
 #define MESSAGE_INT "message_int_content"
+#define SIMPLE_RATE 200
+#define TUNNEL '1'
+#define SENSOR_STATUS 3
 
-int row_num = 0;
-double **c;
-pthread_mutex_t mutex, mutex_row_check;
-MYSQL_RES *res = NULL;
-MYSQL_ROW row; 
-int simple_rate = 200;
+#endif

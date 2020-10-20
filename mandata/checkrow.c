@@ -5,9 +5,12 @@
 #include "../include/checkrow.h"
 #include "../include/database.h"
 
-void * row_check(void * arg)
+extern pthread_mutex_t mutex_row_check;
+
+void * row_check()
 {
     MYSQL *mysql;
+    MYSQL_ROW row1;
     int data_row_num_init = 0;
 
     mysql = mysql_init(NULL);           
@@ -18,8 +21,8 @@ void * row_check(void * arg)
     mysqldb_connect(mysql);
 
     pthread_mutex_lock(&mutex_row_check);
-    mysqldb_query(mysql, "count(*)", TABLE_NAME1, "1", "1");
-    data_row_num_init = atoi(row[0]);
+    row1 = mysqldb_query(mysql, "count(*)", TABLE_NAME1, "1", "1");
+    data_row_num_init = atoi(row1[0]);
 
     mysqldb_update(mysql, MESSAGE_INT, data_row_num_init);
     printf("check row finish!\n");
