@@ -9,7 +9,7 @@ objects_sim = $(lib)/sigsim.o $(lib)/arrayop.o $(lib)/systime.o $(lib)/checkrow.
 	$(lib)/datacharacteric.o $(lib)/savdata.o $(lib)/searchaverage.o $(lib)/searchmax.o $(lib)/searchmin.o
 
 $(bin)/sigsim: $(objects_sim)
-	cc -lmysqlclient -D_REENTRANT -lpthread -o $(bin)/sigsim $(objects_sim)
+	cc -o $(bin)/sigsim $(objects_sim) -lmysqlclient -D_REENTRANT -lpthread 
 
 $(lib)/sigsim.o: $(inc)/systime.h $(inc)/arrayop.h $(inc)/config.h $(inc)/database.h \
 			$(inc)/savdata.h $(inc)/checkrow.h $(inc)/datacharacteric.h
@@ -19,4 +19,4 @@ include $(man)/Makefile
 
 .PHONY: clean
 clean:
-	rm sigsim $(objects_sim)
+	rm $(bin)/sigsim $(objects_sim)

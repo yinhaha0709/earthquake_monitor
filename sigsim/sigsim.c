@@ -49,22 +49,20 @@ int main(int argc, char* argv[])
     int simple_rate = SIMPLE_RATE;
     MYSQL *mysql1;
     MYSQL_ROW row3;
+
+//    pthread_mutex_t mutex, mutex_row_check;
  //   int sec = 10;
-
-    c = allocation_memory_double(10, 2);
-
- //   double **d = allocation_memory_double(2400, 10);
-    char str1[BUF_SIZE], str2[2400][10][BUF_SIZE];
+    double **c = allocation_memory_double(10, 2);
+ /*   char str1[BUF_SIZE], str2[2400][10][BUF_SIZE];
 
     memset(str1, 0, BUF_SIZE);
     for(j=0; j<2400; j++)
         for(k=0; k<10; k++)
             memset(str2[j][k], 0, BUF_SIZE);
-
+*/
     srand((int)time(0));
 
-    b = rand()%1000000;
-
+    b = rand()%1000000; 
     a = b / 1000000.0;
     //printf("%f", a);
 
