@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include <mysql/mysql.h>
 #include "../include/config.h"
 #include "../include/database.h"
@@ -6,14 +7,19 @@
 #include "../include/searchmax.h"
 #include "../include/searchmin.h"
 #include "../include/datacharacteric.h"
+#include "../include/systime.h"
 
 void data_cal_change(int i, int j, int k)
 {
     MYSQL *mysql;
-    double min_1s, max_1s, min_5s, max_5s, min_30s, max_30s, ave_3s, ave_60s, ave_ratio, min_array[30], max_array[30], ave_array[60];
+    double t, min_array[30], max_array[30], ave_array[60];
+    float min_1s, max_1s, min_5s, max_5s, min_30s, max_30s, ave_3s, ave_60s, ave_ratio, sensor_status = 3;
     int x = 0;
+    char field_message[200], value_message[120];
 
-    mysql = mysql_init(NULL);           
+    char tunnel = "1";
+
+    mysql = mysql_init(NULL);
     if (!mysql) {
         printf("\nMysql init failed.\n");
     }
@@ -27,7 +33,7 @@ void data_cal_change(int i, int j, int k)
     for(x=0; x<j;x++)
         max_array[x] = atof(row[x]);
 
-    mysqldb_query(mysql, "ave_data_value", TABLE_NAME4, "1", "1 order by id desc limit 60");
+    mysqldb_query(mysql, "ave_data_value", TABLE_NAME5, "1", "1 order by id desc limit 60");
     for(x=0; x<k; x++)
         ave_array[x] = atof(row[x]);
 
@@ -77,6 +83,12 @@ void data_cal_change(int i, int j, int k)
         ave_ratio = -1;
     else
         ave_ratio = ave_60s / ave_3s;
+
+    t = get_system_time();
+
+    strcpy(field_message, "timestrap, tunnel_ID, max_value_1s, min_value_1s, max_value_5s, min_value_5s, max_value_30s, min_value_30s, ave_value_3s, ave_value_60s, ave_ratio, sensor_status");
+    sprintf(value_message, "%f, %s, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f", t, tunnel, max_1s, min_1s, max_5s, min_5s, max_30s, min_30s, ave_3s, ave_60s, ave_ratio, sensor_status);
+    mysqldb_insert_cal(mysql, TABLE_NAME6, field_message, value_message);
 }
 
 void data_calculation_operation()
@@ -84,6 +96,8 @@ void data_calculation_operation()
     MYSQL *mysql;
     double e[200], f[1000], g[6000], max, min,  ave;
     int i = 0, j = 0, k = 0;
+    char message1[20], message2[20], message3[20];
+
     mysql = mysql_init(NULL);
     if (!mysql) {
         printf("\nMysql init failed.\n");
@@ -97,13 +111,16 @@ void data_calculation_operation()
     max = search_max(e, 200);
     min = search_min(e, 200);
     ave = search_average(e, 200);
+    sprintf(message1, "%f", min);
+    sprintf(message2, "%f", max);
+    sprintf(message3, "%f", ave);
 
     mysqldb_query(mysql, "count(*)", TABLE_NAME3, "1", "1");
     i = atoi(row[0]);
     if(i >= 30){
         mysqldb_delete(mysql, TABLE_NAME3, "min_data_value asc", "1");
     }
-    mysqldb_insert_cal(mysql, TABLE_NAME3, "min_data_value", min);
+    mysqldb_insert_cal(mysql, TABLE_NAME3, "min_data_value", message1);
     mysqldb_alter(mysql, TABLE_NAME3, "id");
 
     mysqldb_query(mysql, "count(*)", TABLE_NAME4, "1", "1");
@@ -111,7 +128,7 @@ void data_calculation_operation()
     if(j >= 30){
         mysqldb_delete(mysql, TABLE_NAME4, "max_data_value asc", "1");
     }
-    mysqldb_insert_cal(mysql, TABLE_NAME4, "max_data_value", max);
+    mysqldb_insert_cal(mysql, TABLE_NAME4, "max_data_value", message2);
     mysqldb_alter(mysql, TABLE_NAME4, "id");
 
     mysqldb_query(mysql, "count(*)", TABLE_NAME5, "1", "1");
@@ -119,6 +136,8 @@ void data_calculation_operation()
     if(k >= 60){
         mysqldb_delete(mysql, TABLE_NAME5, "ave_data_value asc", "1");
     }
-    mysqldb_insert_cal(mysql, TABLE_NAME4, "ave_data_value", max);
-    mysqldb_alter(mysql, TABLE_NAME4, "id");
+    mysqldb_insert_cal(mysql, TABLE_NAME5, "ave_data_value", message3);
+    mysqldb_alter(mysql, TABLE_NAME5, "id");
+
+    data_cal_change(i, j, k);
 }

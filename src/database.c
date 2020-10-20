@@ -40,11 +40,11 @@ void mysqldb_insert(MYSQL *mysql, double timestrap, double value)
     
 }
 
-void mysqldb_insert_cal(MYSQL *mysql, char *table_name, char *field_name, double value)
+void mysqldb_insert_cal(MYSQL *mysql, char *table_name, char *field_name, char *value)
 {  
     int t;  
     char *head = "INSERT INTO ";  
-    char query[120];
+    char query[300];
     char *left = "(";  
     char *right = ") ";  
     char *values = "VALUES";  

@@ -35,7 +35,7 @@ void * data_save(void * arg)
     pthread_mutex_unlock(&mutex_row_check);
 
     if( data_row_num >= 24000){
-        mysqldb_delete(mysql, "timestrap", "10");
+        mysqldb_delete(mysql, "data_test", "timestrap", "10");
     }
     else{
         data_row_num += 10;

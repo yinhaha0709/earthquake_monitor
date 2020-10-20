@@ -11,6 +11,7 @@
 #include "../include/database.h"
 #include "../include/savdata.h"
 #include "../include/checkrow.h"
+#include "../include/datacharacteric.h"
 
 //Generating virtual signals
 double random_sig(double a)
@@ -35,8 +36,8 @@ double random_sig(double a)
 //Main function of generating virtual signal according to time
 int main(int argc, char* argv[])
 {
-    pthread_t id_t1, id_t2;
-    double a, point_per_sec, start_time, start_time1, now_time3f;
+    pthread_t id_t1, id_t2, id_t3;
+    double a, point_per_sec, time_temp1, time_temp2, time_temp3, now_time3f;
     int b,  j, k, data_row_num_init;
     MYSQL *mysql1;
  //   int sec = 10;
@@ -66,10 +67,10 @@ int main(int argc, char* argv[])
     pthread_mutex_init(&mutex, NULL);
     pthread_mutex_init(&mutex_row_check, NULL);
 
-    start_time = get_system_time3f();
-    printf("row in data start time: %f\n", start_time);
+    time_temp1 = get_system_time3f();
+    printf("row in data start time: %f\n", time_temp1);
 
-    /*mysql1 = mysql_init(NULL);           
+    mysql1 = mysql_init(NULL);           
     if (!mysql1) {
         printf("\nMysql init failed.\n");
     }
@@ -81,13 +82,14 @@ int main(int argc, char* argv[])
 
     mysqldb_update(mysql1, MESSAGE_INT, data_row_num_init);
     pthread_mutex_unlock(&mutex_row_check);
-    close_connection(mysql1);*/
+    close_connection(mysql1);
 
     row_check(argc);
     
-    start_time = get_system_time3f();
-    start_time1 = start_time;
-    printf("row in data finish time: %f\n", start_time);
+    time_temp1 = get_system_time3f();
+    time_temp2 = time_temp1;
+    time_temp3 = time_temp1 + 0.5;
+    printf("row in data finish time: %f\n", time_temp1);
 
     while(1)
     {
@@ -99,7 +101,7 @@ int main(int argc, char* argv[])
             //pthread_join(id_t1, NULL);
         }
 
-        if( (now_time3f - start_time) > -0.0001){
+        if( (now_time3f - time_temp1) > -0.0001){
             pthread_mutex_lock(&mutex);
             c[row_num][0] = now_time3f;
             c[row_num][1] = random_sig(a);
@@ -107,18 +109,23 @@ int main(int argc, char* argv[])
             pthread_mutex_unlock(&mutex);
             //printf("%f %f\n", c[row_num][1], c[row_num][2]);
             row_num++;
-            start_time +=  point_per_sec;
-            //printf("%f\n", start_time);
+            time_temp1 +=  point_per_sec;
+            //printf("%f\n", time_temp1);
         } 
 
-        if((now_time3f - start_time1) > 1.0){
+        if((now_time3f - time_temp2) > 1.0){
             pthread_create(&id_t2, NULL, row_check, NULL);
-            start_time1 = now_time3f;
+            time_temp2 = now_time3f;
+        }
+
+        if((now_time3f - time_temp3) > 1.0){
+            pthread_create(&id_t3, NULL, data_calculation_operation, NULL);
+            time_temp3 = now_time3f;
         }
     }
 
-    start_time = get_system_time3f();
-    printf("%f", start_time);
+    time_temp1 = get_system_time3f();
+    printf("%f", time_temp1);
    // fclose(fp);
 
     pthread_mutex_destroy(&mutex);

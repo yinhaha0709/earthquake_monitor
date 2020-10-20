@@ -11,6 +11,7 @@
 #define TABLE_NAME3 "data_min"
 #define TABLE_NAME4 "data_max"
 #define TABLE_NAME5 "data_ave"
+#define TABLE_NAME6 "data_send"
 #define MESSAGE_INT "message_int_content"
 
 int row_num = 0;
