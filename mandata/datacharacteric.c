@@ -92,7 +92,7 @@ void data_cal_change(int i, int j, int k)
     mysqldb_insert_cal(mysql, TABLE_NAME6, field_message, value_message);
 }
 
-void data_calculation_operation()
+void * data_calculation_operation()
 {
     MYSQL *mysql;
     MYSQL_ROW row;

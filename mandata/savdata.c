@@ -7,8 +7,8 @@
 #include "../include/systime.h"
 #include "../include/arrayop.h"
 
-extern double **c;
-extern pthread_mutex_t mutex, mutex_row_check;
+double **c;
+pthread_mutex_t mutex, mutex_row_check;
 
 void * data_save(void * arg)
 {
