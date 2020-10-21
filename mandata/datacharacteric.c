@@ -20,6 +20,7 @@ void data_cal_change(int i, int j, int k)
     char tunnel = TUNNEL;
     MYSQL_ROW row;
 
+
     mysql = mysql_init(NULL);
     if (!mysql) {
         printf("\nMysql init failed.\n");
@@ -108,7 +109,10 @@ void * data_calculation_operation()
 
     row = mysqldb_query(mysql, "value", TABLE_NAME1, "1", "1 order by timestrap desc limit 200");
     for (i=0; i<200; i++)
+    {
         e[i] = atof(row[i]);
+        printf("%f\n", e[i]);
+    }
     
     max = search_max(e, 200);
     min = search_min(e, 200);

@@ -16,7 +16,7 @@
 #include "../include/checkrow.h"
 #include "../include/datacharacteric.h"
 
-extern double **c;
+//extern double **c;
 extern pthread_mutex_t mutex, mutex_row_check;
 
 //Generating virtual signals
@@ -48,11 +48,13 @@ int main(int argc, char* argv[])
     int b,  j, k, data_row_num_init;
     int simple_rate = SIMPLE_RATE;
     MYSQL *mysql1;
-    MYSQL_ROW row3;
+    //MYSQL_ROW row3;
 
 //    pthread_mutex_t mutex, mutex_row_check;
  //   int sec = 10;
-    double **c = allocation_memory_double(10, 2);
+    double c[20];
+    for(j=0; j<20; j++)
+        c[j] = 0;
  /*   char str1[BUF_SIZE], str2[2400][10][BUF_SIZE];
 
     memset(str1, 0, BUF_SIZE);
@@ -75,7 +77,7 @@ int main(int argc, char* argv[])
 
     time_temp1 = get_system_time3f();
     printf("row in data start time: %f\n", time_temp1);
-
+/*
     mysql1 = mysql_init(NULL);           
     if (!mysql1) {
         printf("\nMysql init failed.\n");
@@ -89,13 +91,14 @@ int main(int argc, char* argv[])
     mysqldb_update(mysql1, MESSAGE_INT, data_row_num_init);
     pthread_mutex_unlock(&mutex_row_check);
     close_connection(mysql1);
-
+*/
     row_check();
     
     time_temp1 = get_system_time3f();
     time_temp2 = time_temp1;
     time_temp3 = time_temp1 + 0.5;
     printf("row in data finish time: %f\n", time_temp1);
+    //printf("%d\n", row_num);
 
     while(1)
     {
@@ -103,23 +106,25 @@ int main(int argc, char* argv[])
         //printf("%d\n", row_num);
         if(row_num >= 10){
             row_num = 0;
-            pthread_create(&id_t1, NULL, data_save, NULL);
+            pthread_create(&id_t1, NULL, data_save, (void*)&c);
             //pthread_join(id_t1, NULL);
         }
 
         if( (now_time3f - time_temp1) > -0.0001){
             pthread_mutex_lock(&mutex);
-            c[row_num][0] = now_time3f;
-            c[row_num][1] = random_sig(a);
-            a = c[row_num][1];
+            c[row_num] = now_time3f;
+            c[row_num + 10] = random_sig(a);
+            a = c[row_num + 10];
             pthread_mutex_unlock(&mutex);
-            //printf("%f %f\n", c[row_num][1], c[row_num][2]);
+            printf("%f %f\n", c[row_num], c[row_num + 10]);
             row_num++;
+            //printf("row_num = %d", row_num);
             time_temp1 +=  point_per_sec;
             //printf("%f\n", time_temp1);
         } 
 
         if((now_time3f - time_temp2) > 1.0){
+            printf("while row check");
             pthread_create(&id_t2, NULL, row_check, NULL);
             time_temp2 = now_time3f;
         }
@@ -136,6 +141,6 @@ int main(int argc, char* argv[])
 
     pthread_mutex_destroy(&mutex);
     pthread_mutex_destroy(&mutex_row_check);
-    free_memory_double(c, 10);
+    //free_memory_double(c, 10);
     return 0;
 }

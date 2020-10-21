@@ -11,9 +11,9 @@ objects_sim = $(lib)/sigsim.o $(lib)/arrayop.o $(lib)/systime.o $(lib)/checkrow.
 $(bin)/sigsim: $(objects_sim)
 	cc -o $(bin)/sigsim $(objects_sim) -lmysqlclient -D_REENTRANT -lpthread 
 
-$(lib)/sigsim.o: $(inc)/systime.h $(inc)/arrayop.h $(inc)/config.h $(inc)/database.h \
+$(lib)/sigsim.o: $(sim)/sigsim.c $(inc)/systime.h $(inc)/arrayop.h $(inc)/config.h $(inc)/database.h \
 			$(inc)/savdata.h $(inc)/checkrow.h $(inc)/datacharacteric.h
-	cc -o $(lib)/sigsim.o -D_REENTRANT -lmysqlclient -lpthread -c sigsim.c
+	cc -o $(lib)/sigsim.o -D_REENTRANT -lmysqlclient -lpthread -c $(sim)/sigsim.c
 
 include $(man)/Makefile
 

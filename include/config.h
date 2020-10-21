@@ -20,4 +20,9 @@
 #define TUNNEL '1'
 #define SENSOR_STATUS 3
 
+extern double min_check_array[30];
+extern double max_check_array[30];
+extern double ave_check_array[60];
+extern double *data_check_array[200];
+
 #endif

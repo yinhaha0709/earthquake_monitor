@@ -10,7 +10,7 @@ extern pthread_mutex_t mutex_row_check;
 void * row_check()
 {
     MYSQL *mysql;
-    MYSQL_ROW row1;
+    MYSQL_ROW row2;
     int data_row_num_init = 0;
 
     mysql = mysql_init(NULL);           
@@ -21,8 +21,10 @@ void * row_check()
     mysqldb_connect(mysql);
 
     pthread_mutex_lock(&mutex_row_check);
-    row1 = mysqldb_query(mysql, "count(*)", TABLE_NAME1, "1", "1");
-    data_row_num_init = atoi(row1[0]);
+    row2 = mysqldb_query(mysql, "count(*)", TABLE_NAME1, "1", "1");
+
+    data_row_num_init = atoi(row2[0]);
+    //printf("%d", data_row_num_init);
 
     mysqldb_update(mysql, MESSAGE_INT, data_row_num_init);
     printf("check row finish!\n");

@@ -7,7 +7,7 @@
 #include "../include/systime.h"
 #include "../include/arrayop.h"
 
-double **c;
+//double **c;
 pthread_mutex_t mutex, mutex_row_check;
 
 void * data_save(void * arg)
@@ -22,19 +22,27 @@ void * data_save(void * arg)
     runtime = get_system_time3f();
     printf("data save pthread start time: %f\n", runtime);
 
-    mysql = mysql_init(NULL);           
+    pthread_mutex_lock(&mutex);
+    //printf("mutex data ok");
+    for(m=0; m<10; m++)
+    {
+        //d[m][0] = c[m][0];
+        //d[m][1] = c[m][1];
+        d[m][0] =((double*)arg)[m];
+        d[m][1] = ((double*)arg)[m + 10];
+        printf("%f %f\n", d[m][0], d[m][1]);
+    }
+    printf("copy data ok");
+    pthread_mutex_unlock(&mutex);
+    printf("mutex data ok");
+
+    mysql = mysql_init(NULL); 
     if (!mysql) {
         printf("\nMysql init failed.\n");
     }
+
     mysqldb_connect(mysql);
 
-    pthread_mutex_lock(&mutex);
-    for(m=0; m<10; m++)
-    {
-        d[m][0] = c[m][0];
-        d[m][1] = c[m][1];
-    }
-    pthread_mutex_unlock(&mutex);
 
     pthread_mutex_lock(&mutex_row_check);
     row2 = mysqldb_query(mysql, MESSAGE_INT, TABLE_NAME2, "id", "1");
@@ -57,6 +65,8 @@ void * data_save(void * arg)
     }
 
     close_connection(mysql);
+
+    //free_memory_double(d, 10);
 
     runtime = get_system_time3f();
     printf("data save pthread finish time: %f\n", runtime);

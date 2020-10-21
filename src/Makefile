@@ -25,7 +25,7 @@ $(lib)/searchmax.o: $(src)/searchmax.c $(inc)/searchmax.h
 	cc -o $(lib)/searchmax.o -c $(src)/searchmax.c
 
 $(lib)/searchaverage.o: $(src)/searchaverage.c $(inc)/searchaverage.h
-	cc -o $(lib)/searchaverage.o -c $(src)/searchaverage.c
+	cc -o $(lib)/searchaverage.o -c $(src)/searchaverage.c -lm
 
 .PHONY: clean
 clean:

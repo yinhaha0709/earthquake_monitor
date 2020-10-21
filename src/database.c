@@ -1,8 +1,14 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <mysql/mysql.h>
 #include "../include/config.h"
 #include "../include/database.h"
+
+double min_check_array[30];
+double max_check_array[30];
+double ave_check_array[60];
+double *data_check_array[200];
 
 /* 连接mysql */  
 void mysqldb_connect(MYSQL *mysql)
@@ -10,7 +16,7 @@ void mysqldb_connect(MYSQL *mysql)
     if(!mysql_real_connect(mysql, MYSQL_HOST, MYSQL_USER, MYSQL_PASSWD, DB_NAME, 3306, NULL, 0)) {  
         printf("\nFailed to connect:%s\n", mysql_error(mysql));  
     } else {
-       //printf("\nConnect sucessfully!\n"); 
+       printf("\nConnect sucessfully!\n"); 
     }
 }   
 
@@ -37,7 +43,7 @@ void mysqldb_insert(MYSQL *mysql, double timestrap, double value)
         printf("Failed to query: %s\n", mysql_error(mysql));  
     } 
     else {
-        //printf("\nInsert sucessfully!\n");
+        printf("\nInsert sucessfully!\n");
     }
     
 }
@@ -63,7 +69,7 @@ void mysqldb_insert_cal(MYSQL *mysql, char *table_name, char *field_name, char *
         printf("Failed to query: %s\n", mysql_error(mysql));  
     } 
     else {
-        //printf("\nInsert sucessfully!\n");
+        printf("\nInsert sucessfully!\n");
     }
     
 }
@@ -79,7 +85,7 @@ void mysqldb_alter(MYSQL *mysql, char *table_name, char *field_name)
         printf("Failed to alter1: %s\n", mysql_error(mysql));  
     } 
     else {
-        //printf("\nalter1 sucessfully!\n");
+        printf("\nalter1 sucessfully!\n");
     }
 
     sprintf(query2, "ALTER TABLE %s add %s int(11) primary key auto_increment first", table_name, field_name);
@@ -89,7 +95,7 @@ void mysqldb_alter(MYSQL *mysql, char *table_name, char *field_name)
         printf("Failed to alter2: %s\n", mysql_error(mysql));  
     } 
     else {
-        //printf("\nalter2 sucessfully!\n");
+        printf("\nalter2 sucessfully!\n");
     }
 }
 
@@ -107,7 +113,7 @@ void mysqldb_delete(MYSQL *mysql, char *table_name, char *field_name, char *num)
     if (t) {  
         printf("\nFailed to query: %s\n", mysql_error(mysql));  
     } else {
-        //printf("\nDelete data sucessfully!\n");  
+        printf("\nDelete data sucessfully!\n");  
     }
     
 }   
@@ -127,7 +133,7 @@ void mysqldb_update(MYSQL *mysql, char *field_name, int value)
         printf("Failed to update: %s\n", mysql_error(mysql));  
         return;
     }
-    //printf("\nUpdate data sucessfully!\n");
+    printf("\nUpdate data sucessfully!\n");
 }
 
 //updata double data in table2
@@ -152,6 +158,31 @@ void mysqldb_update_double(MYSQL *mysql, char *field_name, double value, int id)
 /* 查询数据 */
 MYSQL_ROW mysqldb_query(MYSQL *mysql, char *content, char *table_name, char *name, char *value)  
 {  
+    int t, i = 0;
+    char *head = "SELECT  ";
+    char query[120] = {0};
+    MYSQL_RES *res = NULL;
+    MYSQL_ROW row; 
+
+    sprintf(query, "%s%s FROM %s WHERE %s=%s", head, content, table_name, name, value);
+
+    t = mysql_real_query(mysql, query, strlen(query));  
+
+    if (t) {
+        printf("Failed to query: %s\n", mysql_error(mysql)); 
+    } else {
+        printf("\nQuery successfully!\n");  
+    }
+
+    res = mysql_store_result(mysql);
+    row = mysql_fetch_row(res);
+
+    mysql_free_result(res);
+    return row;
+} 
+
+void mysqldb_query_row(MYSQL *mysql, char *content, char *table_name, char *name, char *value)  
+{  
     int t;
     char *head = "SELECT  ";
     char query[120] = {0};
@@ -165,15 +196,19 @@ MYSQL_ROW mysqldb_query(MYSQL *mysql, char *content, char *table_name, char *nam
     if (t) {
         printf("Failed to query: %s\n", mysql_error(mysql)); 
     } else {
-        //printf("\nQuery successfully!\n");  
+        printf("\nQuery successfully!\n");  
     }
 
     res = mysql_store_result(mysql);
-    row = mysql_fetch_row(res);
-    
+    while(row = mysql_fetch_row(res)) {  
+        for(t = 0; t < mysql_num_fields(res); t++) { 
+            printf("%s\n", row[t]);
+            data_check_array[t] = atof(row[t]);
+        }
+        //printf("\n");
+    }
     mysql_free_result(res);
-    return row;
-}  
+} 
 
 /* 断开mysql连接 */ 
 void close_connection(MYSQL *mysql)
