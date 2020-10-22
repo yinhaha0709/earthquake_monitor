@@ -8,7 +8,7 @@
 #include "../include/arrayop.h"
 
 //double **c;
-pthread_mutex_t mutex, mutex_row_check;
+//pthread_mutex_t mutex, mutex_row_check;
 
 void * data_save(void * arg)
 {
@@ -30,11 +30,11 @@ void * data_save(void * arg)
         //d[m][1] = c[m][1];
         d[m][0] =((double*)arg)[m];
         d[m][1] = ((double*)arg)[m + 10];
-        printf("%f %f\n", d[m][0], d[m][1]);
+        //printf("%f %f\n", d[m][0], d[m][1]);
     }
-    printf("copy data ok");
+    //printf("copy data ok\n");
     pthread_mutex_unlock(&mutex);
-    printf("mutex data ok");
+    //printf("mutex data ok\n");
 
     mysql = mysql_init(NULL); 
     if (!mysql) {
@@ -50,7 +50,7 @@ void * data_save(void * arg)
     pthread_mutex_unlock(&mutex_row_check);
 
     if( data_row_num >= 24000){
-        mysqldb_delete(mysql, "data_test", "timestrap", "10");
+        mysqldb_delete(mysql, TABLE_NAME1, "timestrap asc", 10);
     }
     else{
         data_row_num += 10;

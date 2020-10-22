@@ -17,7 +17,7 @@
 #include "../include/datacharacteric.h"
 
 //extern double **c;
-extern pthread_mutex_t mutex, mutex_row_check;
+pthread_mutex_t mutex, mutex_row_check, mutex_cal;
 
 //Generating virtual signals
 double random_sig(double a)
@@ -75,8 +75,8 @@ int main(int argc, char* argv[])
     pthread_mutex_init(&mutex, NULL);
     pthread_mutex_init(&mutex_row_check, NULL);
 
-    time_temp1 = get_system_time3f();
-    printf("row in data start time: %f\n", time_temp1);
+    //time_temp1 = get_system_time3f();
+    //printf("row in data start time: %f\n", time_temp1);
 /*
     mysql1 = mysql_init(NULL);           
     if (!mysql1) {
@@ -97,7 +97,7 @@ int main(int argc, char* argv[])
     time_temp1 = get_system_time3f();
     time_temp2 = time_temp1;
     time_temp3 = time_temp1 + 0.5;
-    printf("row in data finish time: %f\n", time_temp1);
+    //printf("row in data finish time: %f\n", time_temp1);
     //printf("%d\n", row_num);
 
     while(1)
@@ -110,29 +110,30 @@ int main(int argc, char* argv[])
             //pthread_join(id_t1, NULL);
         }
 
+        if((now_time3f - time_temp2) >= 1.0){
+            //printf("while row check\n");
+            pthread_create(&id_t2, NULL, row_check, NULL);
+            time_temp2 = now_time3f;
+        }
+
+        if((now_time3f - time_temp3) >= 1.0){
+            pthread_create(&id_t3, NULL, data_calculation_operation, NULL);
+            time_temp3 = now_time3f;
+        }
+
         if( (now_time3f - time_temp1) > -0.0001){
             pthread_mutex_lock(&mutex);
             c[row_num] = now_time3f;
             c[row_num + 10] = random_sig(a);
             a = c[row_num + 10];
             pthread_mutex_unlock(&mutex);
-            printf("%f %f\n", c[row_num], c[row_num + 10]);
+            //printf("%f %f\n", c[row_num], c[row_num + 10]);
             row_num++;
             //printf("row_num = %d", row_num);
             time_temp1 +=  point_per_sec;
             //printf("%f\n", time_temp1);
         } 
 
-        if((now_time3f - time_temp2) > 1.0){
-            printf("while row check");
-            pthread_create(&id_t2, NULL, row_check, NULL);
-            time_temp2 = now_time3f;
-        }
-
-        if((now_time3f - time_temp3) > 1.0){
-            pthread_create(&id_t3, NULL, data_calculation_operation, NULL);
-            time_temp3 = now_time3f;
-        }
     }
 
     time_temp1 = get_system_time3f();

@@ -23,6 +23,8 @@
 extern double min_check_array[30];
 extern double max_check_array[30];
 extern double ave_check_array[60];
-extern double *data_check_array[200];
+extern double data_check_array[200];
+
+extern pthread_mutex_t mutex, mutex_row_check, mutex_cal;
 
 #endif
