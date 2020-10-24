@@ -1,0 +1,13 @@
+[Unit]
+Description=Vibration simulator start
+
+[Service]
+Type=simple
+User=zncg
+ExecStart=/bin/sh -c "./gitcode/Earthquake_monitor/bin/sigsim"
+WorkingDirectory=/home/zncg
+Restart=always
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target

@@ -15,7 +15,7 @@ void * data_save(void * arg)
     double runtime;
     int m = 0;
     int data_row_num = 0;    
-    double **d = allocation_memory_double(10,2);
+    double **d = allocation_memory_double(100,2);
     MYSQL *mysql;
     MYSQL_ROW row2;
 
@@ -24,12 +24,12 @@ void * data_save(void * arg)
 
     pthread_mutex_lock(&mutex);
     //printf("mutex data ok");
-    for(m=0; m<10; m++)
+    for(m=0; m<100; m++)
     {
         //d[m][0] = c[m][0];
         //d[m][1] = c[m][1];
         d[m][0] =((double*)arg)[m];
-        d[m][1] = ((double*)arg)[m + 10];
+        d[m][1] = ((double*)arg)[m + 100];
         //printf("%f %f\n", d[m][0], d[m][1]);
     }
     //printf("copy data ok\n");
@@ -50,16 +50,16 @@ void * data_save(void * arg)
     pthread_mutex_unlock(&mutex_row_check);
 
     if( data_row_num >= 24000){
-        mysqldb_delete(mysql, TABLE_NAME1, "timestrap asc", 10);
+        mysqldb_delete(mysql, TABLE_NAME1, "timestrap asc", 100);
     }
     else{
-        data_row_num += 10;
+        data_row_num += 100;
         pthread_mutex_lock(&mutex_row_check);
         mysqldb_update(mysql, MESSAGE_INT, data_row_num);
         pthread_mutex_unlock(&mutex_row_check);
     } 
 
-    for(m=0; m<10; m++)
+    for(m=0; m<100; m++)
     {
         mysqldb_insert(mysql, d[m][0], d[m][1]);
     }

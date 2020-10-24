@@ -52,8 +52,8 @@ int main(int argc, char* argv[])
 
 //    pthread_mutex_t mutex, mutex_row_check;
  //   int sec = 10;
-    double c[20];
-    for(j=0; j<20; j++)
+    double c[200];
+    for(j=0; j<200; j++)
         c[j] = 0;
  /*   char str1[BUF_SIZE], str2[2400][10][BUF_SIZE];
 
@@ -104,7 +104,7 @@ int main(int argc, char* argv[])
     {
         now_time3f = get_system_time3f();
         //printf("%d\n", row_num);
-        if(row_num >= 10){
+        if(row_num >= 100){
             row_num = 0;
             pthread_create(&id_t1, NULL, data_save, (void*)&c);
             //pthread_join(id_t1, NULL);
@@ -124,8 +124,8 @@ int main(int argc, char* argv[])
         if( (now_time3f - time_temp1) > -0.0001){
             pthread_mutex_lock(&mutex);
             c[row_num] = now_time3f;
-            c[row_num + 10] = random_sig(a);
-            a = c[row_num + 10];
+            c[row_num + 100] = random_sig(a);
+            a = c[row_num + 100];
             pthread_mutex_unlock(&mutex);
             //printf("%f %f\n", c[row_num], c[row_num + 10]);
             row_num++;
