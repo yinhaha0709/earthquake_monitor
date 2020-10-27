@@ -15,10 +15,20 @@
 #define TABLE_NAME4 "data_max"
 #define TABLE_NAME5 "data_ave"
 #define TABLE_NAME6 "data_send"
+
+#define MQTT_HOST "localhost"
+#define MQTT_PORT 1883
+#define MQTT_TOPIC "test"
+#define MQTT_USER "yinzx"
+#define MQTT_PASSWORD "123456"
+#define MQTT_CLIENTID NULL;
+#define MQTT_SESSION true;
+
 #define MESSAGE_INT "message_int_content"
 #define SIMPLE_RATE 200
 #define TUNNEL '1'
 #define SENSOR_STATUS 3
+#define KEEP_ALIVE 60
 
 extern double min_check_array[30];
 extern double max_check_array[30];
