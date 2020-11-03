@@ -5,6 +5,11 @@
 #include <string.h>
 #include "../include/config.h"
 
+void my_connect_callback(struct mosquitto *mosq, void *obj, int rc)
+{
+    printf("connect callback\n");
+}
+
 int main(int argc, char*argv[])
 {
     bool session = MQTT_SESSION;
@@ -26,6 +31,15 @@ int main(int argc, char*argv[])
         return 1;
     }
     printf("create mosquitto successfully!\n");
+
+    mosquitto_connect_callback_set(mosq, my_connect_callback);
+
+        if(mosquitto_username_pw_set(mosq, MQTT_USER, MQTT_PASSWORD) != MOSQ_ERR_SUCCESS){
+        printf("user and passwd fail!\n");
+        mosquitto_destroy(mosq);
+        mosquitto_lib_cleanup();
+        return 1;
+    }
     
     if(mosquitto_connect(mosq, ip, port, keep_alive) != MOSQ_ERR_SUCCESS){
         printf("mosqpub_connect() failed\n");
@@ -51,7 +65,7 @@ int main(int argc, char*argv[])
     }
     else
     {
-        printf("publish qos0 success!\n");
+        printf("publish qos0 success!\n\n");
     }
 
     mosquitto_destroy(mosq);

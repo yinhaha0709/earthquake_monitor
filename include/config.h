@@ -16,12 +16,13 @@
 #define TABLE_NAME5 "data_ave"
 #define TABLE_NAME6 "data_send"
 
-#define MQTT_HOST "localhost"
+#define MQTT_HOST "iot-cn-m7r1w4jj81b.mqtt.iothub.aliyuncs.com"
+//#define MQTT_HOST "localhost"
 #define MQTT_PORT 1883
-#define MQTT_TOPIC "test"
-#define MQTT_USER "yinzx"
-#define MQTT_PASSWORD "123456"
-#define MQTT_CLIENTID NULL;
+#define MQTT_TOPIC "/g1q4Ckn02eI/D001_test/user/get"
+#define MQTT_USER "D001_test&g1q4Ckn02eI"
+#define MQTT_PASSWORD "56617D05855C0B2293BBF27414F4CB96327C9900"
+#define MQTT_CLIENTID "12345|securemode=3,signmethod=hmacsha1|"
 #define MQTT_SESSION true;
 
 #define MESSAGE_INT "message_int_content"
