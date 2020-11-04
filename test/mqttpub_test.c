@@ -19,7 +19,7 @@ int main(int argc, char*argv[])
     int port = MQTT_PORT;
     int keep_alive = KEEP_ALIVE;
     char message_temp[BUF_SIZE] = "hello test!";
-    char *topic = MQTT_TOPIC;
+    char *topic = MQTT_TOPIC_PUB;
 
     mosquitto_lib_init();
     mosq = mosquitto_new(clientid, session, NULL);

@@ -15,6 +15,7 @@
 #include "../include/savdata.h"
 #include "../include/checkrow.h"
 #include "../include/datacharacteric.h"
+#include "../include/mqtt.h"
 
 //extern double **c;
 pthread_mutex_t mutex, mutex_row_check, mutex_cal;
@@ -70,6 +71,8 @@ int main(int argc, char* argv[])
 
     point_per_sec = 1.0/simple_rate;
     //printf("%f\n", point_per_sec);
+
+    
 
     row_num = 0, j = 0;
     pthread_mutex_init(&mutex, NULL);

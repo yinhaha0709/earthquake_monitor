@@ -7,10 +7,6 @@
 
 int running = 1;
 
-void my_connect_callback(struct mosquitto *mosq, void *obj, int rc)
-{
-    //printf("connect callback\n");
-}
 
 void my_message_callback(struct mosquitto *mosq, void *obj, const struct mosquitto_message *msg)
 {
@@ -27,7 +23,7 @@ int main(int argc, char*argv[])
     char *ip = MQTT_HOST;
     int port = MQTT_PORT;
     int keep_alive = KEEP_ALIVE;
-    char *topic = MQTT_TOPIC;
+    char *topic = MQTT_TOPIC_SUB;
 
 
     mosquitto_lib_init();
@@ -41,7 +37,6 @@ int main(int argc, char*argv[])
     }
     printf("create mosquitto successfully!\n");
 
-    mosquitto_connect_callback_set(mosq, my_connect_callback);
     mosquitto_message_callback_set(mosq, my_message_callback);
 
     if(mosquitto_username_pw_set(mosq, MQTT_USER, MQTT_PASSWORD) != MOSQ_ERR_SUCCESS){
@@ -85,7 +80,6 @@ int main(int argc, char*argv[])
     mosquitto_loop_stop(mosq, false);
     mosquitto_destroy(mosq);
     mosquitto_lib_cleanup();
-    
-    sleep(5);
+
     return 0;
 }

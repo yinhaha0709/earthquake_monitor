@@ -1,3 +1,5 @@
 iot-cn-m7r1w4jj81b.mqtt.iothub.aliyuncs.com
 
 {"method":"thing.service.property.set","id":"1627772832","params":{"max_5s":0.231231},"version":"1.0.0"}
+
+{"method":"thing.service.property.post","id":"1000000000","params":{"ID":"0.00233","longitude":120,"latitude":35,"strain":1.9,"acceleration":1.8,"mode":"0","version":"2"},"version":"1.0.0"}
