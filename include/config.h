@@ -33,6 +33,9 @@
 #define SENSOR_STATUS 3
 #define KEEP_ALIVE 60
 
+#define DATA_PORT "/dev/ttyUSB0"
+#define NET_PORT "/dev/ttyUSB3"
+
 extern double min_check_array[30];
 extern double max_check_array[30];
 extern double ave_check_array[60];

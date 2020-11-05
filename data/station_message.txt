@@ -1,4 +1,4 @@
-station_id: 00.00123
+station_id: 00.00223
 longitude: 100.0
 latitude: 35.0
 strain: 2.0

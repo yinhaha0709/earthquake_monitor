@@ -34,7 +34,7 @@ int main(int argc, char*argv[])
 
     mosquitto_connect_callback_set(mosq, my_connect_callback);
 
-        if(mosquitto_username_pw_set(mosq, MQTT_USER, MQTT_PASSWORD) != MOSQ_ERR_SUCCESS){
+    if(mosquitto_username_pw_set(mosq, MQTT_USER, MQTT_PASSWORD) != MOSQ_ERR_SUCCESS){
         printf("user and passwd fail!\n");
         mosquitto_destroy(mosq);
         mosquitto_lib_cleanup();
@@ -56,6 +56,8 @@ int main(int argc, char*argv[])
         mosquitto_lib_cleanup();
         return 1;
     }
+
+    sleep(1);
 
     if(mosquitto_publish(mosq, NULL, topic, strlen(message_temp)+1, message_temp, 0, 0) != MOSQ_ERR_SUCCESS){
         printf("mqttpub_publish() error\n");

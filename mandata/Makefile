@@ -3,7 +3,7 @@ lib = ../lib
 src = ../src
 man = ../mandata
 
-targets_man = $(lib)/checkrow.o $(lib)/datacharacteric.o $(lib)/eqintensity.o $(lib)/savdata.o
+targets_man = $(lib)/checkrow.o $(lib)/datacharacteric.o $(lib)/eqintensity.o $(lib)/savdata.o $(lib)/stationreg.o
 
 all: $(targets_man)
 
@@ -23,6 +23,9 @@ $(lib)/eqintensity.o: $(man)/eqintensity.c $(inc)/eqintensity.h
 
 $(lib)/savdata.o: $(man)/savdata.c $(inc)/config.h $(inc)/savdata.h $(inc)/database.h $(inc)/systime.h $(inc)/arrayop.h
 	cc -o $(lib)/savdata.o -c $(man)/savdata.c -lmysqlclient -lpthread
+
+$(lib)/stationreg.o: $(man)/stationreg.c $(inc)/config.h $(inc)/stationreg.h $(inc)/mqtt.h
+	cc -o $(lib)/stationreg.o -c $(man)/stationreg.c
 
 .PHONY: clean
 clean:

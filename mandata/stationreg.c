@@ -115,11 +115,12 @@ void station_reg()
     str_long = sizeof("{\"method\":\"thing.service.property.post\",\"id\":\"1000000000\",\"params\":{\"ID\":\"\",\"longitude\":,\"latitude\":,\"strain\":,\"acceleration\":,\"mode\":\"\",\"version\":},\"version\":\"1.0.0\"}") + sizeof(station_id) + sizeof(longitude) + sizeof(latitude) + sizeof(strain) + sizeof(acceleration) + sizeof(mode) + sizeof(version);
     printf("%d\n", str_long);
 
-    my_mqtt_reg(MQTT_TOPIC_PUB, station_id, str_long+8, longitude, latitude, strain, acceleration, mode, version);
+    my_mqtt_reg(MQTT_TOPIC_PUB, station_id, str_long, longitude, latitude, strain, acceleration, mode, version);
     my_mqtt_sub(MQTT_TOPIC_SUB);
 }
-
+/*
 int main()
 {
     station_reg();
 }
+*/
