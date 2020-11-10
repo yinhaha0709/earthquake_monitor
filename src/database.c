@@ -1,14 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <string.h>
 #include <mysql/mysql.h>
 #include "../include/config.h"
 #include "../include/database.h"
 
-double min_check_array[30];
-double max_check_array[30];
-double ave_check_array[60];
-double data_check_array[200];
+double min_check_array[6][30];
+double max_check_array[6][30];
+double ave_check_array[6][60];
+double data_check_array[6][200];
 
 /* 连接mysql */  
 void mysqldb_connect(MYSQL *mysql)
@@ -20,21 +21,21 @@ void mysqldb_connect(MYSQL *mysql)
     }
 }   
 
-/* 插入数据 */
-void mysqldb_insert(MYSQL *mysql, double timestrap, double value)
+/* 插入数据 test*/
+/*
+void mysqldb_insert_test(MYSQL *mysql, double timestrap, double value1, double value2, double value3, double value4, double value5, double value6)
 {  
     int t;  
     char *head = "INSERT INTO ";  
-    char query[120];
-    char field[24] = "timestrap, value";
+    char query[1200];
+    char field[24] = "timestrap, value1, value2, value3, value4, value5, value6";
     char *left = "(";  
     char *right = ") ";  
     char *values = "VALUES";  
-    char message[100] = {0};  
+    char message[1024] = {0};  
 
-    sprintf(message, "%f, %f", timestrap, value);
+    sprintf(message, "%f, %f, %f, %f, %f, %f, %f", timestrap, value1, value2, value3, value4, value5, value6);
 
-    /* 拼接sql命令 */  
     sprintf(query, "%s%s%s%s%s%s%s%s%s", head, TABLE_NAME1, left, field, right, values, left, message, right);
     //printf("%s\n", query);  
 
@@ -47,7 +48,40 @@ void mysqldb_insert(MYSQL *mysql, double timestrap, double value)
     }
     
 }
+*/
 
+/* 插入数据 */
+/*
+void mysqldb_insert(MYSQL *mysql, double timestrap, double value1, double value2, double value3, double value4, double value5, double value6)
+{  
+    int t;  
+    char *head = "INSERT INTO ";  
+    char query[1200];
+    char field[24] = "timestrap, value1, value2, value3, value4, value5, value6";
+    char *left = "(";  
+    char *right = ") ";  
+    char *values = "VALUES";  
+    char message[1024] = {0};  
+
+    sprintf(message, "%f, %f, %f, %f, %f, %f, %f", timestrap, value1, value2, value3, value4, value5, value6);
+*/
+
+    /* 拼接sql命令 */  
+    /*
+    sprintf(query, "%s%s%s%s%s%s%s%s%s", head, TABLE_NAME1, left, field, right, values, left, message, right);
+    //printf("%s\n", query);  
+
+    t = mysql_real_query(mysql, query, strlen(query));
+    if (t) {  
+        printf("Failed to query: %s\n", mysql_error(mysql));  
+    } 
+    else {
+        //printf("\nInsert sucessfully!\n");
+    }
+    
+}
+*/
+/*
 void mysqldb_insert_cal(MYSQL *mysql, char *table_name, char *field_name, char *content_value)
 {  
     int t;  
@@ -60,7 +94,6 @@ void mysqldb_insert_cal(MYSQL *mysql, char *table_name, char *field_name, char *
 
     sprintf(message, "%s", content_value);
 
-    /* 拼接sql命令 */  
     sprintf(query, "%s%s%s%s%s%s%s%s%s", head, table_name, left, field_name, right, values, left, message, right);
     //printf("%s\n", query);  
 
@@ -72,6 +105,27 @@ void mysqldb_insert_cal(MYSQL *mysql, char *table_name, char *field_name, char *
         //printf("\nInsert sucessfully!\n");
     }
     
+}
+*/
+
+void mysqldb_insert(MYSQL *mysql, char *table_name, char *feild_name, char *content_value)
+{
+    int t;
+    char *head = "INSERT INTO ";
+    char query[1024];
+    char *left = "(";
+    char *right = ") ";
+    char *values = "VALUES";
+
+    sprintf(query, "%s%s%s%s%s%s%s%s%s", head, table_name, left, feild_name, right, values, left, content_value, right);
+
+    t = mysql_real_query(mysql, query, strlen(query));
+    if(t){
+        printf("FAILED to query: %s\n", mysql_error(mysql));
+    }
+    else{
+        printf("\nInsert successfully!\n");
+    }
 }
 
 void mysqldb_alter(MYSQL *mysql, char *table_name, char *field_name)
@@ -155,8 +209,8 @@ void mysqldb_update_double(MYSQL *mysql, char *field_name, double value, int id)
     //printf("\nUpdate data sucessfully!\n");
 }
 */
-/* 查询数据 */
-MYSQL_ROW mysqldb_query(MYSQL *mysql, char *content, char *table_name, char *name, char *value)  
+/* 查询数据行数 */
+int mysqldb_query_row(MYSQL *mysql, char *content, char *table_name, char *name, char *value)  
 {  
     int t, i = 0;
     char *head = "SELECT  ";
@@ -178,10 +232,10 @@ MYSQL_ROW mysqldb_query(MYSQL *mysql, char *content, char *table_name, char *nam
     row = mysql_fetch_row(res);
 
     mysql_free_result(res);
-    return row;
+    return atoi(row[0]);
 } 
 
-void mysqldb_query_row(MYSQL *mysql, char *content, char *table_name, char *name, char *value)  
+void mysqldb_query(MYSQL *mysql, char *content, char *table_name, char *name, char *value)  
 {  
     int t, i;
     char *head = "SELECT  ";
@@ -205,18 +259,19 @@ void mysqldb_query_row(MYSQL *mysql, char *content, char *table_name, char *name
         while(row = mysql_fetch_row(res)) {  
             for(t = 0; t < mysql_num_fields(res); t++) { 
                 //printf("%s %d\n", row[t], t);
-                data_check_array[i] = atof(row[t]);
+                data_check_array[t][i] = atof(row[t]);
                 //printf("%f\n", data_check_array[i]);
             }
             i++;
             //printf("\n");
         }
     }
+    
     if(strcmp(table_name, TABLE_NAME3) == 0){
         while(row = mysql_fetch_row(res)) {  
             for(t = 0; t < mysql_num_fields(res); t++) { 
                 //printf("%s %d\n", row[t], t);
-                min_check_array[i] = atof(row[t]);
+                min_check_array[t][i] = atof(row[t]);
                 //printf("%f\n", data_check_array[i]);
             }
             i++;
@@ -227,7 +282,7 @@ void mysqldb_query_row(MYSQL *mysql, char *content, char *table_name, char *name
         while(row = mysql_fetch_row(res)) {  
             for(t = 0; t < mysql_num_fields(res); t++) { 
                 //printf("%s %d\n", row[t], t);
-                max_check_array[i] = atof(row[t]);
+                max_check_array[t][i] = atof(row[t]);
                 //printf("%f\n", data_check_array[i]);
             }
             i++;
@@ -238,7 +293,7 @@ void mysqldb_query_row(MYSQL *mysql, char *content, char *table_name, char *name
         while(row = mysql_fetch_row(res)) {  
             for(t = 0; t < mysql_num_fields(res); t++) { 
                 //printf("%s %d\n", row[t], t);
-                ave_check_array[i] = atof(row[t]);
+                ave_check_array[t][i] = atof(row[t]);
                 //printf("%f\n", data_check_array[i]);
             }
             i++;

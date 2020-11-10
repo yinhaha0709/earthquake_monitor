@@ -1,15 +1,15 @@
 #ifndef __CONFIG_H__
 #define __CONFIG_H__
 
-#include <mysql/mysql.h>
-#include <pthread.h>
+//#include <mysql/mysql.h>
+//#include <pthread.h>
 
 #define BUF_SIZE 30
 #define MYSQL_HOST    "localhost"
 #define MYSQL_USER    "root"
 #define MYSQL_PASSWD  "zncg123456"
-#define DB_NAME "workbench_test"
-#define TABLE_NAME1 "data_test"
+#define DB_NAME "vibration"
+#define TABLE_NAME1 "ontime_data"
 #define TABLE_NAME2 "data_message"
 #define TABLE_NAME3 "data_min"
 #define TABLE_NAME4 "data_max"
@@ -33,13 +33,13 @@
 #define SENSOR_STATUS 3
 #define KEEP_ALIVE 60
 
-#define DATA_PORT "/dev/ttyUSB0"
-#define NET_PORT "/dev/ttyUSB3"
+#define DATA_PORT "/dev/signal_port"
+#define NET_PORT "/dev/net_port"
 
-extern double min_check_array[30];
-extern double max_check_array[30];
-extern double ave_check_array[60];
-extern double data_check_array[200];
+extern double min_check_array[6][30];
+extern double max_check_array[6][30];
+extern double ave_check_array[6][60];
+extern double data_check_array[6][200];
 
 extern int running;
 

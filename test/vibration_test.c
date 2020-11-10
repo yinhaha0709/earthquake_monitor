@@ -7,10 +7,20 @@
 #include <unistd.h>
 #include <termios.h>
 #include <string.h>
+#include <pthread.h>
+#include <mysql/mysql.h>
 #include "../include/config.h"
 #include "../include/systime.h"
+#include "../include/arrayop.h"
+#include "../include/database.h"
+#include "../include/savdata.h"
+#include "../include/checkrow.h"
+#include "../include/datacharacteric.h"
+#include "../include/mqtt.h"
 #include "../include/Crc16.h"
+#include "../include/systime.h"
 
+pthread_mutex_t mutex, mutex_row_check, mutex_cal;
 
 union union_change
 {
@@ -22,13 +32,15 @@ union union_change
 int main(void)
 {
     int fd;
+    pthread_t id_t1;
     struct termios old_cfg, new_cfg;
     int speed;
-    int count, i, j, crc_check;
+    int count, i, j, k, crc_check;
     uint8_t i_data[200];
     float sig_V[6], sig_g[6];
     double sys_time;
     union union_change U1;
+    MYSQL *mysql1;
     
 
     fd = open(DATA_PORT, O_RDWR | O_NOCTTY | O_NDELAY);
@@ -72,6 +84,9 @@ int main(void)
         return -1;
     }
 
+    pthread_mutex_init(&mutex, NULL);
+    pthread_mutex_init(&mutex_row_check, NULL);
+
     j = 0;
 
     while(1){
@@ -98,9 +113,6 @@ int main(void)
                     sig_g[3] = (sig_V[3] - 2.500000) / 1.250000;
                     sig_g[4] = (sig_V[4] - 2.500000) / 1.250000;
                     sig_g[5] = (sig_V[5] - 1.250000) / 1.250000;
-
-                   // printf("\n%f: %f %f %f %f %f %f\n", sys_time, sig_g[0], sig_g[1], sig_g[2], sig_g[3], sig_g[4], sig_g[5]);
-                   
                 }
             }
             j = 0;

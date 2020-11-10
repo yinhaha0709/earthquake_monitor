@@ -24,9 +24,8 @@ void * row_check()
     mysqldb_connect(mysql);
 
     pthread_mutex_lock(&mutex_row_check);
-    row2 = mysqldb_query(mysql, "count(*)", TABLE_NAME1, "1", "1");
+    data_row_num_init = mysqldb_query_row(mysql, "count(*)", TABLE_NAME1, "1", "1");
 
-    data_row_num_init = atoi(row2[0]);
     if((data_row_num_init - 24000) > 0){
         data_row_to_delete = data_row_num_init - 24000;
         mysqldb_delete(mysql, TABLE_NAME1, "timestrap asc", data_row_to_delete);

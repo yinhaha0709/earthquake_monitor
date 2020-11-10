@@ -14,11 +14,11 @@ int main(int argc, char*argv[])
 {
     bool session = MQTT_SESSION;
     struct mosquitto *mosq = NULL;
-    char *clientid = MQTT_CLIENTID;
+    char *clientid = "12345";
     char *ip = MQTT_HOST;
     int port = MQTT_PORT;
     int keep_alive = KEEP_ALIVE;
-    char message_temp[BUF_SIZE] = "hello test!";
+    char message_temp[BUF_SIZE] = "re";
     char *topic = MQTT_TOPIC_PUB;
 
     mosquitto_lib_init();

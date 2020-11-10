@@ -9,8 +9,8 @@
 
 //double **c;
 //pthread_mutex_t mutex, mutex_row_check;
-
-void * data_save(void * arg)
+/*
+void * data_save_test(void * arg)
 {
     double runtime;
     int m = 0;
@@ -45,12 +45,12 @@ void * data_save(void * arg)
 
 
     pthread_mutex_lock(&mutex_row_check);
-    row2 = mysqldb_query(mysql, MESSAGE_INT, TABLE_NAME2, "id", "1");
+    row2 = mysqldb_query_row(mysql, MESSAGE_INT, TABLE_NAME2, "id", "1");
     data_row_num = atoi(row2[0]);
     pthread_mutex_unlock(&mutex_row_check);
 
     if( data_row_num >= 24000){
-        mysqldb_delete(mysql, TABLE_NAME1, "timestrap asc", 100);
+        mysqldb_delete(mysql, TABLE_NAME1, "timestrap asc", 50);
     }
     else{
         data_row_num += 100;
@@ -67,6 +67,73 @@ void * data_save(void * arg)
     close_connection(mysql);
 
     //free_memory_double(d, 10);
+
+    runtime = get_system_time3f();
+    printf("data save pthread finish time: %f\n", runtime);
+}
+*/
+void * data_save(void * arg)
+{
+    double runtime;
+    int m = 0;
+    int data_row_num = 0;    
+    double **d = allocation_memory_double(50, 7);
+    char message[200] = {0};
+    MYSQL *mysql;
+
+    runtime = get_system_time3f();
+    printf("data save pthread start time: %f\n", runtime);
+
+    pthread_mutex_lock(&mutex);
+    //printf("mutex data ok");
+    for(m=0; m<350; m=m+7)
+    {
+        //d[m][0] = c[m][0];
+        //d[m][1] = c[m][1];
+        d[m][0] =((double*)arg)[m];
+        d[m][1] = ((double*)arg)[m + 1];
+        d[m][2] = ((double*)arg)[m + 2];
+        d[m][3] = ((double*)arg)[m + 3];
+        d[m][4] = ((double*)arg)[m + 4];
+        d[m][5] = ((double*)arg)[m + 5];
+        d[m][6] = ((double*)arg)[m + 6];
+        //printf("%f %f\n", d[m][0], d[m][1]);
+    }
+    //printf("copy data ok\n");
+    pthread_mutex_unlock(&mutex);
+    //printf("mutex data ok\n");
+
+    sprintf(message, "%f, %f, %f, %f, %f, %f, %f", d[m][0], d[m][1], d[m][2], d[m][3], d[m][4], d[m][5], d[m][6]);
+
+    mysql = mysql_init(NULL); 
+    if (!mysql) {
+        printf("\nMysql init failed.\n");
+    }
+
+    mysqldb_connect(mysql);
+
+    for(m=0; m<350; m=m+7)
+    {
+        mysqldb_insert(mysql, TABLE_NAME1, "timestrap, value1, value2, value3, value4, value5, value6", message);
+    }
+
+    pthread_mutex_lock(&mutex_row_check);
+    data_row_num = mysqldb_query_row(mysql, MESSAGE_INT, TABLE_NAME2, "id", "1");
+    pthread_mutex_unlock(&mutex_row_check);
+
+    if( data_row_num >= 24000){
+        mysqldb_delete(mysql, TABLE_NAME1, "timestrap asc", 50);
+    }
+    else{
+        data_row_num += 50;
+        pthread_mutex_lock(&mutex_row_check);
+        mysqldb_update(mysql, MESSAGE_INT, data_row_num);
+        pthread_mutex_unlock(&mutex_row_check);
+    } 
+
+    //free_memory_double(d, 10);
+
+    close_connection(mysql);
 
     runtime = get_system_time3f();
     printf("data save pthread finish time: %f\n", runtime);

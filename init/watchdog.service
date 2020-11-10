@@ -1,0 +1,13 @@
+[Unit]
+Description=watchdog
+
+[Service]
+Type=simple
+User=root
+ExecStart=/bin/sh -c "./Earthquake_monitor/bin/watchdog"
+WorkingDirectory=/home/giim
+#Restart=always
+#RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target

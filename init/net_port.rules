@@ -1,0 +1,1 @@
+KERNEL=="ttyUSB*",ATTRS{idVendor}=="1e0e",ATTRS{idProduct}=="9001",MODE:="0777",SYMLINK+="net_port"

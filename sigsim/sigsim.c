@@ -109,7 +109,7 @@ int main(int argc, char* argv[])
         //printf("%d\n", row_num);
         if(row_num >= 100){
             row_num = 0;
-            pthread_create(&id_t1, NULL, data_save, (void*)&c);
+            pthread_create(&id_t1, NULL, data_save_test, (void*)&c);
             //pthread_join(id_t1, NULL);
         }
 
