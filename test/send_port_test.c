@@ -99,7 +99,7 @@ int main(void)
                     sig_g[4] = (sig_V[4] - 2.500000) / 1.250000;
                     sig_g[5] = (sig_V[5] - 1.250000) / 1.250000;
 
-                   // printf("\n%f: %f %f %f %f %f %f\n", sys_time, sig_g[0], sig_g[1], sig_g[2], sig_g[3], sig_g[4], sig_g[5]);
+                   printf("\n%f: %f %f %f %f %f %f\n", sys_time, sig_g[0], sig_g[1], sig_g[2], sig_g[3], sig_g[4], sig_g[5]);
                    
                 }
             }

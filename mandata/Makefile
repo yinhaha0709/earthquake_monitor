@@ -15,8 +15,8 @@ $(lib)/checkrow.o: $(man)/checkrow.c $(inc)/config.h $(inc)/checkrow.h $(inc)/da
 	cc -o $(lib)/checkrow.o -c $(man)/checkrow.c -D_REENTRANT -lpthread -lmysqlclient
 
 $(lib)/datacharacteric.o: $(man)/datacharacteric.c $(inc)/config.h $(inc)/database.h $(inc)/searchmin.h \
-			$(inc)/searchmax.h $(inc)/searchaverage.h $(inc)/datacharacteric.h $(inc)/systime.h
-	cc -o $(lib)/datacharacteric.o -c $(man)/datacharacteric.c -lmysqlclient
+			$(inc)/searchmax.h $(inc)/searchaverage.h $(inc)/datacharacteric.h $(inc)/systime.h $(inc)/generalSend.h
+	cc -o $(lib)/datacharacteric.o -c $(man)/datacharacteric.c -lmysqlclient -D_REENTRANT -lpthread
 
 $(lib)/eqintensity.o: $(man)/eqintensity.c $(inc)/eqintensity.h
 	cc -o $(lib)/eqintensity.o -c $(man)/eqintensity.c

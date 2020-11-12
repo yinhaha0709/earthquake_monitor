@@ -6,25 +6,11 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <termios.h>
-//#include <mosquitto.h>
 #include <string.h>
-#include <pthread.h>
-#include <mysql/mysql.h>
 #include "../include/config.h"
 #include "../include/systime.h"
-//#include "../include/arrayop.h"
-//#include "../include/database.h"
-#include "../include/savdata.h"
-#include "../include/checkrow.h"
-#include "../include/datacharacteric.h"
-#include "../include/mqtt.h"
 #include "../include/Crc16.h"
-//#include "../include/systime.h"
-#include "../include/registerSend.h"
-#include "../include/ontimeSend.h"
 
-pthread_mutex_t mutex, mutex_row_check, mutex_cal;
-float sig_g[6];
 
 union union_change
 {
@@ -36,21 +22,14 @@ union union_change
 int main(void)
 {
     int fd;
-    pthread_t id_t1, id_t2, id_t3, id_t4;
     struct termios old_cfg, new_cfg;
     int speed;
-    int count, row_count, crc_check;
-    int  i, j, k;
+    int count, i, j, crc_check;
     uint8_t i_data[200];
-    float sig_V[6];
-    double sys_time, time_temp1, time_temp2, time_temp3;
+    float sig_V[6], sig_g[6];
+    double sys_time;
     union union_change U1;
-    MYSQL *mysql1;
-    //struct mosquitto *mosq = NULL;
-
-    double c[350];
-    for(j=0; j<350; j++)
-        c[j] = 0;    
+    
 
     fd = open(DATA_PORT, O_RDWR | O_NOCTTY | O_NDELAY);
 
@@ -93,43 +72,9 @@ int main(void)
         return -1;
     }
 
-    //my_mqtt_connect();
-
-    my_mqtt_connect();
-    sleep(1);
-    station_reg();
-    my_mqtt_closeconn();
-
-    //printf("ok1!\n");
-    //station_reg();
-    //printf("ok2!\n");
-    pthread_mutex_init(&mutex, NULL);
-    pthread_mutex_init(&mutex_row_check, NULL);
-
-    my_mqtt_connect();
-
-    row_count = 0; j = 0;
-
-    time_temp1 = get_system_time3f();
-    time_temp2 = time_temp1 + 0.5;
-    time_temp3 = time_temp1 + 5;
+    j = 0;
 
     while(1){
-        if(row_count >= 350){
-            row_count = 0;
-            pthread_create(&id_t1, NULL, data_save, (void*)&c);
-        }
-
-        if((sys_time - time_temp2) >= 1.0){
-            pthread_create(&id_t2, NULL, row_check, NULL);
-            time_temp2 = sys_time;
-        }
-
-        if((sys_time - time_temp3) >= 1.0){
-            pthread_create(&id_t3, NULL, data_calculation_operation, NULL);
-            time_temp3 = sys_time;        
-        }
-
     	if((count = read(fd, i_data, 200)) > 0){
             if((i_data[0] == 0x70) && (i_data[1] == 0x03) && (i_data[2] == 0x18)){
                 if((crc_check = calc_crc16(i_data, count)) == 0){
@@ -149,29 +94,18 @@ int main(void)
 
                     sig_g[0] = (sig_V[0] - 1.500000) / 0.300000;
                     sig_g[1] = (sig_V[1] - 1.500000) / 0.300000;
-                    sig_g[2] = ((sig_V[2] - 1.500000) / 0.300000) - 1.0;
+                    sig_g[2] = (sig_V[2] - 1.800000) / 0.300000;
                     sig_g[3] = (sig_V[3] - 2.500000) / 1.250000;
                     sig_g[4] = (sig_V[4] - 2.500000) / 1.250000;
-                    sig_g[5] = ((sig_V[5] - 2.500000) / 1.250000) + 1.0;
+                    sig_g[5] = (sig_V[5] - 1.250000) / 1.250000;
 
-                    pthread_create(&id_t4, NULL, ontimeSend_Aliyun, NULL);
-
-                    c[row_count] = sys_time;
-                    row_count++;
-
-                    for(k=0; k<6; k++)
-                    {
-                        c[row_count] = sig_g[k];
-			            //printf("\n%d %f: %d %f\n", row_count, c[row_count], k, sig_g[k]);
-			            row_count++;
-                    }
+                   printf("\n%f: %f %f %f %f %f %f\n", sys_time, sig_V[0], sig_V[1], sig_V[2], sig_V[3], sig_V[4], sig_V[5]);
+                   
                 }
             }
-            i = 0; j = 0; k = 0;
+            j = 0;
     	}
     }
-
-    my_mqtt_closeconn();
     close(fd);
     return 0;
 }

@@ -9,7 +9,261 @@
 
 int running;
 
-void my_mqtt_reg(char *topic, char *station_id, int str_long, float longitude, float latitude, float strain, float acceleration, char mode, char version)
+struct mosquitto *mosq = NULL;
+struct mosquitto *mosq1 = NULL;
+
+void my_mqtt_connect()
+{
+    //struct mosquitto *mosq = NULL;
+    char *clientid = MQTT_CLIENTID;
+    char *ip = MQTT_HOST;
+    int port = MQTT_PORT;
+    int keep_alive = KEEP_ALIVE;
+    bool session = MQTT_SESSION;
+
+    mosquitto_lib_init();
+    mosq = mosquitto_new(clientid, session, NULL);
+
+    if(!mosq){
+        printf("mqttpub_connect create() failed\n");
+        mosquitto_destroy(mosq);
+        mosquitto_lib_cleanup();
+        return;
+    }
+    printf("create mosquitto successfully!\n");
+
+    //mosquitto_message_callback_set(mosq, my_message_callback);
+
+    if(mosquitto_username_pw_set(mosq, MQTT_USER, MQTT_PASSWORD) != MOSQ_ERR_SUCCESS){
+        printf("user and passwd fail!\n");
+        mosquitto_destroy(mosq);
+        mosquitto_lib_cleanup();
+        return;
+    }
+    
+    if(mosquitto_connect(mosq, ip, port, keep_alive) != MOSQ_ERR_SUCCESS){
+        printf("mosqpub_connect() failed\n");
+        mosquitto_destroy(mosq);
+        mosquitto_lib_cleanup();
+        return;
+    }
+    printf("connect %s:%d successfully!\n", ip, port);
+
+    int loop = mosquitto_loop_start(mosq);
+    if(loop != MOSQ_ERR_SUCCESS){
+        printf("mosquitto loop error\n");
+        mosquitto_destroy(mosq);
+        mosquitto_lib_cleanup();
+        return;
+    }
+
+}
+
+void my_mqtt_publish(char *topic, char *payload)
+{
+    int mid = 123;
+
+    if(mosquitto_publish(mosq, &mid, topic, strlen(payload)+1, payload, 0, 0) != MOSQ_ERR_SUCCESS){
+        printf("mqttpub_publish() error\n");
+        mosquitto_destroy(mosq);
+        mosquitto_lib_cleanup();
+        return;
+    }
+    else
+    {
+        printf("publish qos0 success!\n\n");
+    }
+}
+
+void my_mqtt_subcribe(char *topic)
+{
+    char *clientid = MQTT_CLIENTID;
+    char *ip = MQTT_HOST;
+    int port = MQTT_PORT;
+    int keep_alive = KEEP_ALIVE;
+    bool session = MQTT_SESSION;
+
+    mosquitto_lib_init();
+    mosq = mosquitto_new(clientid, session, NULL);
+
+    if(!mosq){
+        printf("mqttpub_connect create() failed\n");
+        mosquitto_destroy(mosq);
+        mosquitto_lib_cleanup();
+        return;
+    }
+    printf("create mosquitto successfully!\n");
+
+    mosquitto_message_callback_set(mosq, my_message_callback);
+
+    if(mosquitto_username_pw_set(mosq, MQTT_USER, MQTT_PASSWORD) != MOSQ_ERR_SUCCESS){
+        printf("user and passwd fail!\n");
+        mosquitto_destroy(mosq);
+        mosquitto_lib_cleanup();
+        return;
+    }
+    
+    if(mosquitto_connect(mosq, ip, port, keep_alive) != MOSQ_ERR_SUCCESS){
+        printf("mosqpub_connect() failed\n");
+        mosquitto_destroy(mosq);
+        mosquitto_lib_cleanup();
+        return;
+    }
+    printf("connect %s:%d successfully!\n", ip, port);
+
+    int loop = mosquitto_loop_start(mosq);
+    if(loop != MOSQ_ERR_SUCCESS){
+        printf("mosquitto loop error\n");
+        mosquitto_destroy(mosq);
+        mosquitto_lib_cleanup();
+        return;
+    }
+    running = 1;
+
+    if(mosquitto_subscribe(mosq, NULL, topic, 0) != MOSQ_ERR_SUCCESS){
+        printf("mqttsub_test() error\n");
+        mosquitto_destroy(mosq);
+        mosquitto_lib_cleanup();
+        return;
+    }
+    else
+    {
+        printf("subcribe qos0 success!\n");
+    }
+
+    while(running)
+    {
+        sleep(1);
+    }
+
+    mosquitto_loop_stop(mosq, false);
+    mosquitto_destroy(mosq);
+    mosquitto_lib_cleanup();
+}
+
+void my_message_callback(struct mosquitto *mosq, void *obj, const struct mosquitto_message *msg)
+{
+    printf("receive a message of %s: %s\n", (char *)msg->topic, (char *)msg->payload);
+    running = 0;
+    mosquitto_disconnect(mosq);
+}
+
+
+void my_mqtt_closeconn()
+{
+    mosquitto_disconnect(mosq);
+    mosquitto_loop_stop(mosq, false);
+    mosquitto_destroy(mosq);
+    mosquitto_lib_cleanup();
+    printf("mqtt close\n");
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void vibration_mqtt_connect()
+{
+    //struct mosquitto *mosq = NULL;
+    char *clientid = "12345";
+    char *ip = SERVER_HOST;
+    int port = SERVER_PORT;
+    int keep_alive = KEEP_ALIVE;
+    bool session = MQTT_SESSION;
+
+    mosquitto_lib_init();
+    mosq1 = mosquitto_new(clientid, session, NULL);
+
+    if(!mosq1){
+        printf("mqttpub_connect create() failed\n");
+        mosquitto_destroy(mosq1);
+        mosquitto_lib_cleanup();
+        return;
+    }
+    printf("create mosquitto successfully!\n");
+
+    mosquitto_message_callback_set(mosq1, vibration_message_callback);
+
+    if(mosquitto_username_pw_set(mosq1, SERVER_USER, SERVER_PASSWORD) != MOSQ_ERR_SUCCESS){
+        printf("user and passwd fail!\n");
+        mosquitto_destroy(mosq1);
+        mosquitto_lib_cleanup();
+        return;
+    }
+    
+    if(mosquitto_connect(mosq1, ip, port, keep_alive) != MOSQ_ERR_SUCCESS){
+        printf("mosqpub_connect() failed\n");
+        mosquitto_destroy(mosq1);
+        mosquitto_lib_cleanup();
+        return;
+    }
+    printf("connect %s:%d successfully!\n", ip, port);
+
+    int loop = mosquitto_loop_start(mosq1);
+    if(loop != MOSQ_ERR_SUCCESS){
+        printf("mosquitto loop error\n");
+        mosquitto_destroy(mosq1);
+        mosquitto_lib_cleanup();
+        return;
+    }
+
+}
+
+void vibration_publish(char *topic, char *payload)
+{
+    int mid = 123;
+
+    if(mosquitto_publish(mosq1, &mid, topic, strlen(payload)+1, payload, 1, 0) != MOSQ_ERR_SUCCESS){
+        printf("mqttpub_publish() error\n");
+        mosquitto_destroy(mosq1);
+        mosquitto_lib_cleanup();
+        return;
+    }
+    else
+    {
+        printf("publish qos1 success!\n\n");
+    }
+}
+
+void vibration_subcribe(char *topic)
+{
+    //struct mosquitto *mosq = NULL;
+    //running = 1;
+
+    if(mosquitto_subscribe(mosq1, NULL, topic, 1) != MOSQ_ERR_SUCCESS){
+        printf("mqttsub_test() error\n");
+        mosquitto_destroy(mosq1);
+        mosquitto_lib_cleanup();
+        return;
+    }
+    else
+    {
+        printf("subcribe qos1 success!\n");
+    }
+
+    while(1)
+    {
+        sleep(1);
+    }
+}
+
+void vibration_message_callback(struct mosquitto *mosq1, void *obj, const struct mosquitto_message *msg)
+{
+    printf("receive a message of %s: %s\n", (char *)msg->topic, (char *)msg->payload);
+    //running = 0;
+    mosquitto_disconnect(mosq1);
+}
+
+
+void vibration_closeconn()
+{
+    mosquitto_disconnect(mosq1);
+    mosquitto_loop_stop(mosq1, false);
+    mosquitto_destroy(mosq1);
+    mosquitto_lib_cleanup();
+    printf("mqtt close\n");
+}
+
+/*
+void my_mqtt_reg(char *topic, char *station_id, int str_long, float longitude, float latitude, float strain, float acceleration, char *mode, char *version)
 {
     bool session = MQTT_SESSION;
     struct mosquitto *mosq = NULL;
@@ -32,8 +286,8 @@ void my_mqtt_reg(char *topic, char *station_id, int str_long, float longitude, f
     cJSON_AddNumberToObject(load, "latitude", latitude);
     cJSON_AddNumberToObject(load, "strain", strain);
     cJSON_AddNumberToObject(load, "acceleration", acceleration);
-    cJSON_AddItemToObject(load, "mode", cJSON_CreateString("0"));
-    cJSON_AddItemToObject(load, "version", cJSON_CreateString("2"));
+    cJSON_AddItemToObject(load, "mode", cJSON_CreateString(mode));
+    cJSON_AddItemToObject(load, "version", cJSON_CreateString(version));
     cJSON_AddItemToObject(head, "version", cJSON_CreateString("1.0.0"));    
 
     //sprintf(payload, "{\"method\":\"thing.service.property.set\",\"id\":\"1000000000\",\"params\":{\"ID\":\"%s\",\"longitude\":%f,\"latitude\":%f,\"strain\":%f,\"acceleration\":%f,\"mode\":\"%c\",\"version\":\"%c\"},\"version\":\"1.0.0\"}", station_id, longitude, latitude, strain, acceleration, mode, version);
@@ -97,7 +351,7 @@ void my_mqtt_reg(char *topic, char *station_id, int str_long, float longitude, f
     return;
 }
 
-void my_mqtt_pub(char *payload, char *topic)
+void my_mqtt_pub(char *topic, char *payload)
 {
     bool session = MQTT_SESSION;
     struct mosquitto *mosq = NULL;
@@ -139,6 +393,8 @@ void my_mqtt_pub(char *payload, char *topic)
         mosquitto_lib_cleanup();
         return;
     }
+
+    sleep(1);
 
     if(mosquitto_publish(mosq, NULL, topic, strlen(payload)+1, payload, 0, 0) != MOSQ_ERR_SUCCESS){
         printf("mqttpub_publish() error\n");
@@ -234,6 +490,7 @@ void my_mqtt_sub(char *topic)
     mosquitto_lib_cleanup();
 
 }
+*/
 /*
 int main()
 {

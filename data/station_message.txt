@@ -1,7 +1,7 @@
-station_id: 00.00223
+station_id: 00.00123
 longitude: 100.0
 latitude: 35.0
 strain: 2.0
 acceleration: 2.0
-mode: 0
-version: 2
+mode: 1
+version: 0

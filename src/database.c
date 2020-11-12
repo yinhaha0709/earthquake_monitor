@@ -112,7 +112,7 @@ void mysqldb_insert(MYSQL *mysql, char *table_name, char *feild_name, char *cont
 {
     int t;
     char *head = "INSERT INTO ";
-    char query[1024];
+    char query[LONG_BUF_SIZE];
     char *left = "(";
     char *right = ") ";
     char *values = "VALUES";
@@ -123,15 +123,16 @@ void mysqldb_insert(MYSQL *mysql, char *table_name, char *feild_name, char *cont
     if(t){
         printf("FAILED to query: %s\n", mysql_error(mysql));
     }
-    else{
+/*    else{
         printf("\nInsert successfully!\n");
     }
+*/
 }
 
 void mysqldb_alter(MYSQL *mysql, char *table_name, char *field_name)
 {
     int t;
-    char query1[120], query2[120];
+    char query1[SHORT_BUF_SIZE], query2[SHORT_BUF_SIZE];
     sprintf(query1, "ALTER TABLE %s DROP %s", table_name, field_name);
     t = mysql_real_query(mysql, query1, strlen(query1));
 
@@ -158,7 +159,7 @@ void mysqldb_delete(MYSQL *mysql, char *table_name, char *field_name, int num)
 {  
     int t;
     char *head = "DELETE FROM ";  
-    char query[120];  
+    char query[SHORT_BUF_SIZE];  
 
     sprintf(query, "%s%s where 1=1 order by %s limit %d", head, table_name, field_name, num);
     //printf("%s\n", query);
@@ -177,7 +178,7 @@ void mysqldb_update(MYSQL *mysql, char *field_name, int value)
 {  
     int t;
     char *head = "UPDATE ";
-    char query[120];
+    char query[SHORT_BUF_SIZE];
 
     sprintf(query, "%s%s SET %s=%d WHERE id=1", head, TABLE_NAME2, field_name, value);
     //printf("%s\n", query);
@@ -214,7 +215,7 @@ int mysqldb_query_row(MYSQL *mysql, char *content, char *table_name, char *name,
 {  
     int t, i = 0;
     char *head = "SELECT  ";
-    char query[120] = {0};
+    char query[SHORT_BUF_SIZE] = {0};
     MYSQL_RES *res = NULL;
     MYSQL_ROW row; 
 
@@ -235,11 +236,11 @@ int mysqldb_query_row(MYSQL *mysql, char *content, char *table_name, char *name,
     return atoi(row[0]);
 } 
 
-void mysqldb_query(MYSQL *mysql, char *content, char *table_name, char *name, char *value)  
+int mysqldb_query(MYSQL *mysql, char *content, char *table_name, char *name, char *value)  
 {  
     int t, i;
     char *head = "SELECT  ";
-    char query[120] = {0};
+    char query[LONG_BUF_SIZE] = {0};
     MYSQL_RES *res = NULL;
     MYSQL_ROW row; 
 
@@ -299,6 +300,9 @@ void mysqldb_query(MYSQL *mysql, char *content, char *table_name, char *name, ch
             i++;
             //printf("\n");
         }
+
+        printf("%d\n", i);
+        return i;
     }
 
 /*

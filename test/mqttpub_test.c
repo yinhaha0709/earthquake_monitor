@@ -18,7 +18,7 @@ int main(int argc, char*argv[])
     char *ip = MQTT_HOST;
     int port = MQTT_PORT;
     int keep_alive = KEEP_ALIVE;
-    char message_temp[BUF_SIZE] = "re";
+    char message_temp[SHORT_BUF_SIZE] = "re";
     char *topic = MQTT_TOPIC_PUB;
 
     mosquitto_lib_init();
