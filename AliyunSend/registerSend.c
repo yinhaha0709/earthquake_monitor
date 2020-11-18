@@ -44,7 +44,7 @@ void station_reg()
         return;
     }
 
-    while ((ch = fgetc(fp)) != EOF)
+    while ((ch = fgetc(fp)) != EOF && ch != '\377')
     {
         if (ch == '\n')
         {
@@ -118,7 +118,7 @@ void station_reg()
     }
 
     fclose(fp);
-    printf("ok\n");
+    //printf("ok\n");
     /*
     U1.i_char_char = version[0];
     printf("%x\n%c\n%d\n", U1.i_char_bit, U1.i_char_char, U1.i_char_int);
@@ -145,6 +145,7 @@ void station_reg()
     payload = cJSON_Print(head);
     printf("%s\n", payload);
     //printf("ok\n");
+
 
     my_mqtt_publish(MQTT_TOPIC_PUB, payload);
     my_mqtt_closeconn();

@@ -14,15 +14,15 @@
 #include "../include/systime.h"
 //#include "../include/arrayop.h"
 //#include "../include/database.h"
-#include "../include/savdata.h"
-#include "../include/checkrow.h"
+#include "../include/sigsave.h"
+#include "../include/rowchange.h"
 #include "../include/datacharacteric.h"
 #include "../include/mqtt.h"
 #include "../include/Crc16.h"
-#include "../include/registerSend.h"
-#include "../include/ontimeSend.h"
+#include "../include/infoinit.h"
+#include "../include/register.h"
 
-pthread_mutex_t mutex, mutex_row_check, mutex_cal;
+pthread_mutex_t mutex;
 float sig_g[6];
 
 union union_change
@@ -45,7 +45,6 @@ int main(void)
     double sys_time, time_temp1, time_temp2, time_temp3;
     union union_change U1;
     MYSQL *mysql1;
-    //struct mosquitto *mosq = NULL;
 
     double c[350];
     for(j=0; j<350; j++)
@@ -92,20 +91,12 @@ int main(void)
         return -1;
     }
 
-    //my_mqtt_connect();
+/////////////////////////////////////
 
-    my_mqtt_connect();
-    sleep(1);
-    station_reg();
-    my_mqtt_closeconn();
+information_init();
+register_send();
 
-    //printf("ok1!\n");
-    //station_reg();
-    //printf("ok2!\n");
-    pthread_mutex_init(&mutex, NULL);
-    pthread_mutex_init(&mutex_row_check, NULL);
-
-    my_mqtt_connect();
+/////////////////////////////////////
 
     row_count = 0; j = 0;
 
@@ -116,11 +107,11 @@ int main(void)
     while(1){
         if(row_count >= 350){
             row_count = 0;
-            pthread_create(&id_t1, NULL, data_save, (void*)&c);
+            pthread_create(&id_t1, NULL, signal_save, (void*)&c);
         }
 
         if((sys_time - time_temp2) >= 1.0){
-            pthread_create(&id_t2, NULL, row_check, NULL);
+            pthread_create(&id_t2, NULL, row_change, NULL);
             time_temp2 = sys_time;
         }
 
@@ -153,7 +144,6 @@ int main(void)
                     sig_g[4] = (sig_V[4] - 2.500000) / 1.250000;
                     sig_g[5] = ((sig_V[5] - 2.500000) / 1.250000) + 1.0;
 
-                    pthread_create(&id_t4, NULL, ontimeSend_Aliyun, NULL);
 
                     c[row_count] = sys_time;
                     row_count++;
@@ -169,8 +159,4 @@ int main(void)
             i = 0; j = 0; k = 0;
     	}
     }
-
-    my_mqtt_closeconn();
-    close(fd);
-    return 0;
 }

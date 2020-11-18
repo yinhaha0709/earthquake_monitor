@@ -38,7 +38,7 @@ $(bin)/mqtt_test: $(inc)/config.h $(inc)/registerSend.h $(inc)/mqtt.h $(inc)/cJS
 	cc -o $(bin)/mqtt_test $(test)/mqtt_test.c $(lib)/mqtt.o $(lib)/cJSON.o $(lib)/registerSend.o -lmosquitto
 
 $(bin)/server_test: $(inc)/config.h $(inc)/mqtt.h $(test)/server_test.c $(lib)/mqtt.o
-	cc -o $(bin)/server_test $(test)/server_test.c $(lib)/mqtt.o -lmosquitto
+	cc -g -o $(bin)/server_test $(test)/server_test.c $(lib)/mqtt.o -lmosquitto
 
 include ../AliyunSend/Makefile
 include ../src/Makefile

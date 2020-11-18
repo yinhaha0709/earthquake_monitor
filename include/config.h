@@ -35,12 +35,21 @@
 #define SERVER_USER "USER"
 #define SERVER_PASSWORD "password"
 #define SERVER_QOS 1
-#define SERVER_REGPUB "vibrate/11_23212/register/data"
-#define SERVER_REGSUB "vibrate/11_23212/register/control"
-#define SERVER_FEATURE "vibrate/11_23212/feature/data"
-#define SERVER_ONTIMESUB "vibrate/11_23212/ontime/control"
-#define SERVER_ONTIMEPUB "vibrate/11_23212/ontime/data"
-#define SERVER_EVENT "vibrate/11_23212/event/data"
+#define MQTT_HEAD "vibrate/"
+#define MQTT_REGPUB "/register/data"
+#define MQTT_REGSUB "/register/control"
+#define MQTT_FEATURE "/feature/data"
+#define MQTT_ONTIMEPUB "/ontime/data"
+#define MQTT_ONTIMESUB "/ontime/control"
+#define MQTT_EVENT "/event/data"
+
+
+#define SERVER_REGPUB "vibrate/GZ.23212/register/data"
+#define SERVER_REGSUB "vibrate/GZ.23212/register/control"
+#define SERVER_FEATURE "vibrate/GZ.23212/feature/data"
+#define SERVER_ONTIMESUB "vibrate/GZ.23212/ontime/control"
+#define SERVER_ONTIMEPUB "vibrate/GZ.23212/ontime/data"
+#define SERVER_EVENT "vibrate/GZ.23212/event/data"
 
 #define MESSAGE_INT "message_int_content"
 #define SIMPLE_RATE 200
@@ -63,10 +72,16 @@ extern float sensor_status;
 extern double timestrap;
 
 extern int running;
+extern int ontime;
 
 extern pthread_mutex_t mutex, mutex_row_check, mutex_cal;
 
 extern struct mosquitto *mosq;
 extern struct mosquitto *mosq1;
+
+extern char station_id[8], mode, version;
+extern float longitude, latitude, strain, acceleration;
+
+extern char *topic_regpub, *topic_regsub, *topic_feature, *topic_ontimepub, *topic_ontimesub, *topic_event;
 
 #endif

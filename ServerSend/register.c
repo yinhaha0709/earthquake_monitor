@@ -5,7 +5,11 @@
 #include <unistd.h>
 #include "../include/config.h"
 #include "../include/mqtt.h"
-
+#include "../include/register.h"
+/*
+char station_id[8], mode, version;
+float longitude, latitude, strain, acceleration;
+*/
 typedef struct VibtationReg_T
 {
     union
@@ -41,7 +45,6 @@ typedef struct VibtationReg_T
     union
     {
         float strain_temp;
-        int int_strain;
         uint8_t byte_strain[4];
     };
 
@@ -65,19 +68,21 @@ typedef struct VibtationReg_T
 }VibtationReg_t;
 
 
-int main(void)
+void register_send()
 {
+/*
     char str[30], temp[8], ch;
 
     FILE *fp;
     int i = 0, j = 0;
     int copy_status = 0;
-
+*/
+    int i = 0;
     uint8_t payload[32];
     memset(payload, 0, 32);
     VibtationReg_t Reg_temp;
     //union union_change U1;
-
+/*
     memset(str, 0, 30);
     memset(temp, 0, 8);
     memset(&version, 0, 1);
@@ -87,7 +92,7 @@ int main(void)
     if (fp == NULL)
     {
         printf("fail to open reg file!\n");
-        return 0;
+        return;
     }
 
     while ((ch = fgetc(fp)) != EOF && ch != '\377')
@@ -137,9 +142,9 @@ int main(void)
                 memset(str, 0, 30);
                 break;
             case 6:
-                strncpy(&version, str, j);
+                strncpy(version, str, j);
                 version = version - '0';
-                memset(str, 0, 30);
+                memset(&str, 0, 30);
                 break;
             default:
                 break;
@@ -160,6 +165,7 @@ int main(void)
     }
 
     fclose(fp);
+    */
 
     strcpy(Reg_temp.type_temp, "re");
     printf("%x %x\n", Reg_temp.type_temp[0], Reg_temp.type_temp[1]);
@@ -218,13 +224,11 @@ int main(void)
     printf("\n");
 
     vibration_mqtt_connect();
-    vibration_subcribe(SERVER_REGSUB);
+    vibration_subcribe(topic_regsub);
     while(running)
     {
-        vibration_publish(SERVER_REGPUB, payload);
+        vibration_publish(topic_regpub, payload);
         sleep(1);
     }
 
-    vibration_closeconn();
-    return 0;
 }

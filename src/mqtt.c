@@ -9,8 +9,39 @@
 
 int running;
 
+char station_id[8], mode, version;
+float longitude, latitude, strain, acceleration;
+
 struct mosquitto *mosq = NULL;
 struct mosquitto *mosq1 = NULL;
+
+typedef struct RegSub_T
+{
+    union
+    {
+        char type_temp[2];
+        uint8_t byte_type[2];
+    };
+
+    union
+    {
+        int long_temp;
+        uint8_t byte_long[4];
+    };
+
+    union
+    {
+        char id_temp[8];
+        uint8_t byte_id[8];
+    };
+
+    union
+    {
+        short auth_temp;
+        uint8_t byte_auth[2];
+    };
+
+}RegSub_t;
 
 void my_mqtt_connect()
 {
@@ -207,11 +238,11 @@ void vibration_mqtt_connect()
 
 }
 
-void vibration_publish(char *topic, char *payload)
+void vibration_publish(char *topic, uint8_t *payload)
 {
     int mid = 123;
 
-    if(mosquitto_publish(mosq1, &mid, topic, strlen(payload)+1, payload, 1, 0) != MOSQ_ERR_SUCCESS){
+    if(mosquitto_publish(mosq1, &mid, topic, 32, payload, 1, 0) != MOSQ_ERR_SUCCESS){
         printf("mqttpub_publish() error\n");
         mosquitto_destroy(mosq1);
         mosquitto_lib_cleanup();
@@ -237,19 +268,38 @@ void vibration_subcribe(char *topic)
     else
     {
         printf("subcribe qos1 success!\n");
+        running = 1;
     }
-
+/*
     while(1)
     {
         sleep(1);
     }
+    */
 }
 
 void vibration_message_callback(struct mosquitto *mosq1, void *obj, const struct mosquitto_message *msg)
 {
-    printf("receive a message of %s: %s\n", (char *)msg->topic, (char *)msg->payload);
+    printf("receive a message of %s: ", (char *)msg->topic);
+    
+    if(strcmp((char *)msg->topic, SERVER_REGSUB) == 0){
+
+        RegSub_t RegSub_temp;
+
+        memcpy(RegSub_temp.byte_type, msg->payload, 2);
+        memcpy(RegSub_temp.byte_long, msg->payload+2, 4);
+        memcpy(RegSub_temp.byte_id, msg->payload+6, 8);
+        memcpy(RegSub_temp.byte_auth, msg->payload+14, 2);
+        //printf("start\n");
+
+        printf("%s %d %s %d\n", RegSub_temp.type_temp, RegSub_temp.long_temp, RegSub_temp.id_temp, RegSub_temp.auth_temp);
+
+        if((strcmp(RegSub_temp.type_temp, "rr") == 0) && (strcmp(RegSub_temp.id_temp, station_id) == 0) && RegSub_temp.auth_temp == 0){
+            running = 0;
+        }
+    }
     //running = 0;
-    mosquitto_disconnect(mosq1);
+    //mosquitto_disconnect(mosq1);
 }
 
 

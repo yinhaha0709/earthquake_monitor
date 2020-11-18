@@ -10,7 +10,7 @@ void my_message_callback(struct mosquitto *mosq, void *obj, const struct mosquit
 void my_mqtt_closeconn();
 
 void vibration_mqtt_connect();
-void vibration_publish(char *topic, char *payload);
+void vibration_publish(char *topic, uint8_t *payload);
 void vibration_subcribe(char *topic);
 void vibration_message_callback(struct mosquitto *mosq, void *obj, const struct mosquitto_message *msg);
 void vibration_closeconn();
