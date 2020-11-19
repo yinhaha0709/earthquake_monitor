@@ -225,9 +225,10 @@ void register_send()
 
     vibration_mqtt_connect();
     vibration_subcribe(topic_regsub);
+    vibration_subcribe(topic_ontimesub);
     while(running)
     {
-        vibration_publish(topic_regpub, payload);
+        vibration_publish(topic_regpub, payload, 32);
         sleep(1);
     }
 

@@ -265,37 +265,44 @@ int mysqldb_query(MYSQL *mysql, char *content, char *table_name, char *name, cha
             }
             i++;
             //printf("\n");
+
         }
     }
     
     if(strcmp(table_name, TABLE_NAME3) == 0){
         while(row = mysql_fetch_row(res)) {  
-            for(t = 0; t < mysql_num_fields(res); t++) { 
-                //printf("%s %d\n", row[t], t);
-                min_check_array[t][i] = atof(row[t]);
-                //printf("%f\n", data_check_array[i]);
+            if(i < 30){
+                for(t = 0; t < mysql_num_fields(res); t++) { 
+                    //printf("%s %d\n", row[t], t);
+                    min_check_array[t][i] = atof(row[t]);
+                    //printf("%f\n", data_check_array[i]);
+                }
             }
             i++;
             //printf("\n");
         }
     }
     if(strcmp(table_name, TABLE_NAME4) == 0){
-        while(row = mysql_fetch_row(res)) {  
-            for(t = 0; t < mysql_num_fields(res); t++) { 
-                //printf("%s %d\n", row[t], t);
-                max_check_array[t][i] = atof(row[t]);
-                //printf("%f\n", data_check_array[i]);
-            }
+        while(row = mysql_fetch_row(res)) {
+            if(i < 30){
+                for(t = 0; t < mysql_num_fields(res); t++) { 
+                    //printf("%s %d\n", row[t], t);
+                    max_check_array[t][i] = atof(row[t]);
+                    //printf("%f\n", data_check_array[i]);
+                }
+            }  
             i++;
             //printf("\n");
         }
     }
     if(strcmp(table_name, TABLE_NAME5) == 0){
         while(row = mysql_fetch_row(res)) {  
-            for(t = 0; t < mysql_num_fields(res); t++) { 
-                //printf("%s %d\n", row[t], t);
-                ave_check_array[t][i] = atof(row[t]);
-                //printf("%f\n", data_check_array[i]);
+            if(i < 60){
+                for(t = 0; t < mysql_num_fields(res); t++) { 
+                    //printf("%s %d\n", row[t], t);
+                    ave_check_array[t][i] = atof(row[t]);
+                    //printf("%f\n", data_check_array[i]);
+                }
             }
             i++;
             //printf("\n");

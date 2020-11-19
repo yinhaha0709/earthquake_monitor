@@ -16,7 +16,7 @@
 //#include "../include/database.h"
 #include "../include/sigsave.h"
 #include "../include/rowchange.h"
-#include "../include/datacharacteric.h"
+#include "../include/commfeature.h"
 #include "../include/mqtt.h"
 #include "../include/Crc16.h"
 #include "../include/infoinit.h"
@@ -110,13 +110,13 @@ register_send();
             pthread_create(&id_t1, NULL, signal_save, (void*)&c);
         }
 
-        if((sys_time - time_temp2) >= 1.0){
+        if((sys_time - time_temp2) >= 5.0){
             pthread_create(&id_t2, NULL, row_change, NULL);
             time_temp2 = sys_time;
         }
 
         if((sys_time - time_temp3) >= 1.0){
-            pthread_create(&id_t3, NULL, data_calculation_operation, NULL);
+            pthread_create(&id_t3, NULL, common_feature, NULL);
             time_temp3 = sys_time;        
         }
 

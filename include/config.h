@@ -57,6 +57,8 @@
 #define SENSOR_STATUS 3
 #define KEEP_ALIVE 60
 
+#define ENDIAN 1
+
 #define DATA_PORT "/dev/signal_port"
 #define NET_PORT "/dev/net_port"
 
@@ -68,13 +70,13 @@ extern double data_check_array[6][200];
 extern float sig_g[6];
 
 extern float min_1s[6], max_1s[6], min_5s[6], max_5s[6], min_30s[6], max_30s[6], ave_3s[6], ave_60s[6], ave_ratio[6];
-extern float sensor_status;
+extern float sensor_status[6];
 extern double timestrap;
 
 extern int running;
 extern int ontime;
 
-extern pthread_mutex_t mutex, mutex_row_check, mutex_cal;
+extern pthread_mutex_t mutex, mutex_row_check, mutex_cal, mutex_min, mutex_max, mutex_ave;
 
 extern struct mosquitto *mosq;
 extern struct mosquitto *mosq1;

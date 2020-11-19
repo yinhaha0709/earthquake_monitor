@@ -200,13 +200,13 @@ int main(void)
     //sprintf(payload, "re%04s11.23212%04s%04s%04s%04s11", (char)Reg_temp.long_temp, (char)Reg_temp.int_longtitude, (char)Reg_temp.int_latitude, (char)Reg_temp.int_strain, (char)Reg_temp.int_acceleration);
     //printf("%x\n", payload);
 
-   memcpy(&payload[0], Reg_temp.byte_type, 2);
-    memcpy(&payload[2], Reg_temp.byte_long, 4);
-    memcpy(&payload[6], Reg_temp.byte_id, 8);
-    memcpy(&payload[14], Reg_temp.byte_longitude, 4);
-    memcpy(&payload[18], Reg_temp.byte_latitude, 4);
-    memcpy(&payload[22], Reg_temp.byte_strain, 4);
-    memcpy(&payload[26], Reg_temp.byte_acceleration, 4);
+   memcpy(&payload[0], Reg_temp.type_temp, 2);
+    memcpy(&payload[2], &Reg_temp.long_temp, 4);
+    memcpy(&payload[6], Reg_temp.id_temp, 8);
+    memcpy(&payload[14], &Reg_temp.longitude_temp, 4);
+    memcpy(&payload[18], &Reg_temp.latitude_temp, 4);
+    memcpy(&payload[22], &Reg_temp.strain_temp, 4);
+    memcpy(&payload[26], &Reg_temp.acceleration_temp, 4);
     memcpy(&payload[30], &Reg_temp.byte_mode, 1);
     memcpy(&payload[31], &Reg_temp.byte_version, 1);
 
@@ -216,7 +216,7 @@ int main(void)
     } 
 
     printf("\n");
-
+/*
     vibration_mqtt_connect();
     vibration_subcribe(SERVER_REGSUB);
     while(running)
@@ -226,5 +226,6 @@ int main(void)
     }
 
     vibration_closeconn();
+    */
     return 0;
 }

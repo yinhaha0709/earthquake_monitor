@@ -238,11 +238,11 @@ void vibration_mqtt_connect()
 
 }
 
-void vibration_publish(char *topic, uint8_t *payload)
+void vibration_publish(char *topic, uint8_t *payload, int byte_size)
 {
     int mid = 123;
 
-    if(mosquitto_publish(mosq1, &mid, topic, 32, payload, 1, 0) != MOSQ_ERR_SUCCESS){
+    if(mosquitto_publish(mosq1, &mid, topic, byte_size, payload, 1, 0) != MOSQ_ERR_SUCCESS){
         printf("mqttpub_publish() error\n");
         mosquitto_destroy(mosq1);
         mosquitto_lib_cleanup();

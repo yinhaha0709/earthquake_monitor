@@ -9,25 +9,23 @@
 #include "../include/searchaverage.h"
 #include "../include/searchmax.h"
 #include "../include/searchmin.h"
+#include "../include/getstatus.h"
 #include "../include/systime.h"
-#include "../include/cJSON.h"
 #include "../include/mqtt.h"
-#include "../include/generalSend.h"
+#include "../include/commfeature.h"
 
-float min_1s[6], max_1s[6], min_5s[6], max_5s[6], min_30s[6], max_30s[6], ave_3s[6], ave_60s[6], ave_ratio[6];
-float sensor_status = SENSOR_STATUS;
+float min_1s[6], max_1s[6], min_5s[6], max_5s[6], min_30s[6], max_30s[6], ave_3s[6], ave_60s[6], ave_ratio[6], sensor_status[6];
 double timestrap;
+char message1[60], message2[60], message3[60];
 
-void common_feature_cal(int i, int j, int k, double t)
+void * feature_change(void * arg)
 {
-    pthread_t id_t5;
+    //pthread_mutex_t mutex_change;
     MYSQL *mysql;
-    double min_array[6][30], max_array[6][30], ave_array[6][60];
-    //float min_1s[6], max_1s[6], min_5s[6], max_5s[6], min_30s[6], max_30s[6], ave_3s[6], ave_60s[6], ave_ratio[6];
-    //float sensor_status = SENSOR_STATUS;
-    int x = 0, y=0;
-    char field_message[1024], value_message[2048];
-    char tunnel = TUNNEL;
+    int row = 0;
+    int row_temp;
+    int x, y;
+    char *table_name = (char *)arg;
 
     mysql = mysql_init(NULL);
     if (!mysql) {
@@ -35,155 +33,242 @@ void common_feature_cal(int i, int j, int k, double t)
     }
     mysqldb_connect(mysql);
 
-    printf("data_cal_change start\n");
-    //pthread_mutex_lock(&mutex_min);
-    mysqldb_query(mysql, "min_data_value1, min_data_value2, min_data_value3, min_data_value4, min_data_value5, min_data_value6", TABLE_NAME3, "1", "1 order by id desc limit 30");
-    printf("query finish\n");
-    for(x=0; x<6; x++)
-    for(y=0; y<i; y++)
+    if(strcmp(table_name, TABLE_NAME3) == 0){
+        double min_array[6][30];
+
+        pthread_mutex_lock(&mutex_min);
+
+        mysqldb_insert(mysql, TABLE_NAME3, "min_data_value1, min_data_value2, min_data_value3, min_data_value4, min_data_value5, min_data_value6", message1);
+        row = mysqldb_query(mysql, "min_data_value1, min_data_value2, min_data_value3, min_data_value4, min_data_value5, min_data_value6", TABLE_NAME3, "1", "1 order by id desc");
+
+        if(row > 30){
+            mysqldb_delete(mysql, TABLE_NAME3, "id asc", row - 30);
+            mysqldb_alter(mysql, TABLE_NAME3, "id");
+            row = 30;
+        }
+
+        for(x=0; x<6; x++)
+        for(y=0; y<row; y++)
+        {
+            min_array[x][y] = min_check_array[x][y];
+	        //printf("%f\n", min_array[x][y]);
+        }
+
+        for (x = 0; x < 6; x++)
+        {
+            min_1s[x] = min_array[x][0];
+        }
+
+        if (row < 5)
+        {
+            for (x = 0; x < 6; x++)
+            {
+                min_5s[x] = search_min(min_array[x], row);
+                min_30s[x] = min_5s[x];
+            }
+        }
+        else if (row < 30)
+        {
+            for (x = 0; x < 6; x++)
+            {
+                min_5s[x] = search_min(min_array[x], 5);
+                min_30s[x] = search_min(min_array[x], row);
+            }
+        }
+        else if (row >= 30)
+        {
+            for (x = 0; x < 6; x++)
+            {
+                min_5s[x] = search_min(min_array[x], 5);
+                min_30s[x] = search_min(min_array[x], 30);
+            }
+        }
+
+        pthread_mutex_unlock(&mutex_min);
+    }
+
+    if (strcmp(table_name, TABLE_NAME4) == 0)
     {
-        min_array[x][y] = min_check_array[x][y];
-	//printf("%f\n", min_array[x][y]);
+        double max_array[6][30];
+
+        pthread_mutex_lock(&mutex_max);
+
+        mysqldb_insert(mysql, TABLE_NAME4, "max_data_value1, max_data_value2, max_data_value3, max_data_value4, max_data_value5, max_data_value6", message2);
+
+        row = mysqldb_query(mysql, "max_data_value1, max_data_value2, max_data_value3, max_data_value4, max_data_value5, max_data_value6", TABLE_NAME4, "1", "1 order by id desc");
+
+        if (row > 30)
+        {
+            mysqldb_delete(mysql, TABLE_NAME4, "id asc", row - 30);
+            mysqldb_alter(mysql, TABLE_NAME4, "id");
+            row = 30;
+        }
+
+        for (x = 0; x < 6; x++)
+            for (y = 0; y < row; y++)
+            {
+                max_array[x][y] = max_check_array[x][y];
+                //printf("%f\n", min_array[x][y]);
+            }
+
+        for (x = 0; x < 6; x++)
+        {
+            max_1s[x] = max_array[x][0];
+        }
+
+        if (row < 5)
+        {
+            for (x = 0; x < 6; x++)
+            {
+                max_5s[x] = search_max(max_array[x], row);
+                max_30s[x] = max_5s[x];
+            }
+        }
+        else if (row < 30)
+        {
+            for (x = 0; x < 6; x++)
+            {
+                max_5s[x] = search_max(max_array[x], 5);
+                max_30s[x] = search_max(max_array[x], row);
+            }
+        }
+        else if (row >= 30)
+        {
+            for (x = 0; x < 6; x++)
+            {
+                max_5s[x] = search_max(max_array[x], 5);
+                max_30s[x] = search_max(max_array[x], 30);
+            }
+        }
+
+        pthread_mutex_unlock(&mutex_max);
     }
-    //pthread_mutex_unlock(&mutex_min);
 
-    //pthread_mutex_lock(&mutex_max);
-    mysqldb_query(mysql, "max_data_value1, max_data_value2, max_data_value3, max_data_value4, max_data_value5, max_data_value6", TABLE_NAME4, "1", "1 order by id desc limit 30");
-    for(x=0; x<6; x++)
-    for(y=0; y<j; y++)
-        max_array[x][y] = max_check_array[x][y];
-    //pthread_mutex_unlock(&mutex_max);
-
-    //pthread_mutex_lock(&mutex_ave);
-    mysqldb_query(mysql, "ave_data_value1, ave_data_value2, ave_data_value3, ave_data_value4, ave_data_value5, ave_data_value6", TABLE_NAME5, "1", "1 order by id desc limit 60");
-    for(x=0; x<6; x++)
-    for(y=0; y<k; y++)
-        ave_array[x][y] = ave_check_array[x][y];
-    //pthread_mutex_unlock(&mutex_ave);
-
-    for(x=0; x<6; x++)
+    if (strcmp(table_name, TABLE_NAME5) == 0)
     {
-        min_1s[x] = min_array[x][0];
-        max_1s[x] = max_array[x][0];
+        double ave_array[6][60];
+
+        pthread_mutex_lock(&mutex_ave);
+
+        mysqldb_insert(mysql, TABLE_NAME5, "ave_data_value1, ave_data_value2, ave_data_value3, ave_data_value4, ave_data_value5, ave_data_value6", message3);
+        row = mysqldb_query(mysql, "ave_data_value1, ave_data_value2, ave_data_value3, ave_data_value4, ave_data_value5, ave_data_value6", TABLE_NAME5, "1", "1 order by id desc");
+
+        if (row > 60)
+        {
+            mysqldb_delete(mysql, TABLE_NAME5, "id asc", row - 30);
+            mysqldb_alter(mysql, TABLE_NAME5, "id");
+            row = 60;
+        }
+
+        for (x = 0; x < 6; x++)
+            for (y = 0; y < row; y++)
+            {
+                ave_array[x][y] = ave_check_array[x][y];
+                //printf("%f\n", min_array[x][y]);
+            }
+
+        if (row < 3)
+        {
+            for (x = 0; x < 6; x++)
+            {
+                ave_3s[x] = search_average(ave_array[x], row);
+                ave_60s[x] = ave_3s[x];
+            }
+        }
+        else if (row < 60)
+        {
+            for (x = 0; x < 6; x++)
+            {
+                ave_3s[x] = search_average(ave_array[x], 3);
+                ave_60s[x] = search_average(ave_array[x], row);
+            }
+        }
+        else if (row >= 60)
+        {
+            for (x = 0; x < 6; x++)
+            {
+                ave_3s[x] = search_average(ave_array[x], 3);
+                ave_60s[x] = search_average(ave_array[x], 60);
+            }
+        }
+
+        for (x = 0; x < 6; x++)
+        {
+            if (ave_3s[x] == 0.0)
+                ave_ratio[x] = 0;
+            else
+                ave_ratio[x] = ave_60s[x] / ave_3s[x];
+        }
+
+        pthread_mutex_unlock(&mutex_ave);
     }
 
-
-    if(i < 5){
-        for(x=0; x<6; x++)
-        {
-            min_5s[x] = search_min(min_array[x], i);
-            min_30s[x] = min_5s[x];
-        }
-    }
-    else if(i < 30){
-        for(x=0; x<6; x++)
-        {
-            min_5s[x] = search_min(min_array[x], 5);
-            min_30s[x] = search_min(min_array[x], i);
-        }
-    }
-    else if(i >= 30){
-        for(x=0; x<6; x++)
-        {
-            min_5s[x] = search_min(min_array[x], 5);
-            min_30s[x] = search_min(min_array[x], 30);
-        }
-    }
-
-    if(j < 5){
-        for(x=0; x<6; x++)
-        {
-            max_5s[x] = search_max(max_array[x], i);
-            max_30s[x] = max_5s[x];
-        }
-    }
-    else if(j < 30){
-        for(x=0; x<6; x++)
-        {
-            max_5s[x] = search_max(max_array[x], 5);
-            max_30s[x] = search_max(max_array[x], i);
-        }
-    }
-    else if(j >= 30){
-        for(x=0; x<6; x++)
-        {
-            max_5s[x] = search_max(max_array[x], 5);
-            max_30s[x] = search_max(max_array[x], 30);
-        }
-    }
-
-    if(k < 3){
-        for(x=0; x<6; x++)
-        {
-            ave_3s[x] = search_average(ave_array[x], k);
-            ave_60s[x] = ave_3s[x];
-        }
-    }
-    else if(k < 60){
-        for(x=0; x<6; x++)
-        {
-            ave_3s[x] = search_average(ave_array[x], 3);
-            ave_60s[x] = search_average(ave_array[x], k);
-        }
-    }
-    else if(k >= 60){
-        for(x=0; x<6; x++)
-        {
-            ave_3s[x] = search_average(ave_array[x], 3);
-            ave_60s[x] = search_average(ave_array[x], 60);
-        }
-    }
-
-    for(x=0; x<6; x++)
-    {
-        if(ave_3s[x] == 0.0)
-            ave_ratio[x] = 0;
-        else
-            ave_ratio[x] = ave_60s[x] / ave_3s[x];
-    }
-
-    //printf("\n%f: %f, %f, %f, %f, %f, %f, %f, %f, %f, %f\n", t, max_1s[0], min_1s[0], max_5s[0], min_5s[0], max_30s[0], min_30s[0], ave_3s[0], ave_60s[0], ave_ratio[0], sensor_status);
-    
-    timestrap = t;
-
-    pthread_create(&id_t5, NULL, generalFeature_Send, NULL);
-
-    strcpy(field_message, "timestrap, max_value1_1s, min_value1_1s, \
-max_value1_5s, min_value1_5s, max_value1_30s, min_value1_30s,\
-ave_value1_3s, ave_value1_60s, ave_ratio1, sensor_status1, \
-max_value2_1s, min_value2_1s, max_value2_5s, min_value2_5s, \
-max_value2_30s, min_value2_30s, ave_value2_3s, ave_value2_60s, ave_ratio2, sensor_status2, \
-max_value3_1s, min_value3_1s, max_value3_5s, min_value3_5s, \
-max_value3_30s, min_value3_30s, ave_value3_3s, ave_value3_60s, ave_ratio3, sensor_status3, \
-max_value4_1s, min_value4_1s, max_value4_5s, min_value4_5s, max_value4_30s, min_value4_30s, \
-ave_value4_3s, ave_value4_60s, ave_ratio4, sensor_status4, \
-max_value5_1s, min_value5_1s, max_value5_5s, min_value5_5s, max_value5_30s, min_value5_30s, \
-ave_value5_3s, ave_value5_60s, ave_ratio5, sensor_status5, \
-max_value6_1s, min_value6_1s, max_value6_5s, min_value6_5s, max_value6_30s, min_value6_30s, \
-ave_value6_3s, ave_value6_60s, ave_ratio6, sensor_status6");
-
-    sprintf(value_message, "%f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, \
-%f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, \
-%f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f", \
-    t, max_1s[0], min_1s[0], max_5s[0], min_5s[0], max_30s[0], min_30s[0], ave_3s[0], ave_60s[0], ave_ratio[0], sensor_status, \
-    max_1s[1], min_1s[1], max_5s[1], min_5s[1], max_30s[1], min_30s[1], ave_3s[1], ave_60s[1], ave_ratio[1], sensor_status, \
-    max_1s[2], min_1s[2], max_5s[2], min_5s[2], max_30s[2], min_30s[2], ave_3s[2], ave_60s[2], ave_ratio[2], sensor_status, \
-    max_1s[3], min_1s[3], max_5s[3], min_5s[3], max_30s[3], min_30s[3], ave_3s[3], ave_60s[3], ave_ratio[3], sensor_status, \
-    max_1s[4], min_1s[4], max_5s[4], min_5s[4], max_30s[4], min_30s[4], ave_3s[4], ave_60s[4], ave_ratio[4], sensor_status, \
-    max_1s[5], min_1s[5], max_5s[5], min_5s[5], max_30s[5], min_30s[5], ave_3s[5], ave_60s[5], ave_ratio[5], sensor_status);
-    printf("\n%s\n%s\n", field_message, value_message);
-    mysqldb_insert(mysql, TABLE_NAME6, field_message, value_message);
     close_connection(mysql);
+}
+
+void * feature_send()
+{
+    char *type = "fd";
+    char endian = ENDIAN;
+    char num, num_next, tunnel;
+    int data_long = 311;
+    int block_long = 48;
+    uint8_t payload[311];
+    memset(payload, 0, 311);
+    int i, j;
+
+    memcpy(&payload[0], type, 2);
+    memcpy(&payload[2], &data_long, 4);
+    memcpy(&payload[6], station_id, 8);
+    memcpy(&payload[14], &timestrap, 8);
+    memcpy(&payload[22], &mode, 1);
+    i = 23, j = 0;
+    for (j = 0; j < 6; j++)
+    {
+        num = j + 1;
+        num_next = j + 2;
+        tunnel = j + 1;
+        memcpy(&payload[i], &num, 1);
+        memcpy(&payload[i + 1], &num_next, 1);
+        memcpy(&payload[i + 2], &endian, 1);
+        memcpy(&payload[i + 3], &block_long, 4);
+        memcpy(&payload[i + 7], &tunnel, 1);
+        memcpy(&payload[i + 8], &max_1s[j], 4);
+        memcpy(&payload[i + 12], &min_1s[j], 4);
+        memcpy(&payload[i + 16], &max_5s[j], 4);
+        memcpy(&payload[i + 20], &min_5s[j], 4);
+        memcpy(&payload[i + 24], &max_30s[j], 4);
+        memcpy(&payload[i + 28], &min_30s[j], 4);
+        memcpy(&payload[i + 32], &ave_3s[j], 4);
+        memcpy(&payload[i + 36], &ave_60s[j], 4);
+        memcpy(&payload[i + 40], &ave_ratio[j], 4);
+        memcpy(&payload[i + 44], &sensor_status[j], 4);
+
+        i = i + 48;
+    }
+
+    for(i = 0; i < data_long; i++)
+    {
+        printf("%x ", payload[i]);
+    }
+
+    vibration_publish(topic_feature, payload, data_long);
 }
 
 void * common_feature()
 {
     MYSQL *mysql;
     double e[6][200], max[6], min[6],  ave[6], time_temp4, t;
-    int row = 0, i = 0, j = 0, k = 0, l = 0;
-    char message1[60], message2[60], message3[60];
+    int row = 0, i = 0, row_send = 0;
+    float nominal;
+    pthread_t id_min, id_max, id_ave, id_featsend;
+    char *min_table = TABLE_NAME3;
+    char *max_table = TABLE_NAME4;
+    char *ave_table = TABLE_NAME5;
+    char field_message[1024], value_message[2048];
 
-    t = get_system_time();
+
+    timestrap = get_system_time();
 
     time_temp4 = get_system_time3f();
     printf("\ndata cal start time: %f\n", time_temp4);
@@ -209,57 +294,68 @@ void * common_feature()
         max[row] = search_max(e[row], 200);
         min[row] = search_min(e[row], 200);
         ave[row] = search_average(e[row], 200);
+        if(row < 3)
+            nominal = acceleration;
+        else
+            nominal = strain;
+        
+        sensor_status[row] = get_status(e[row], 200, nominal);
     }
+
+    memset(message1, 0, 60);
+    memset(message2, 0, 60);
+    memset(message3, 0, 60);
 
     sprintf(message1, "%f, %f, %f, %f, %f, %f", min[0], min[1], min[2], min[3], min[4], min[5]);
     sprintf(message2, "%f, %f, %f, %f, %f, %f", max[0], max[1], max[2], max[3], max[4], max[5]);
     sprintf(message3, "%f, %f, %f, %f, %f, %f", ave[0], ave[1], ave[2], ave[3], ave[4], ave[5]);
 
+    pthread_create(&id_min, NULL, feature_change, (void*)min_table);
+    pthread_create(&id_max, NULL, feature_change, (void*)max_table);
+    pthread_create(&id_ave, NULL, feature_change, (void*)ave_table);
+
+    pthread_join(id_min, NULL);
+    pthread_join(id_max, NULL);
+    pthread_join(id_ave, NULL);
+
+    pthread_create(&id_featsend, NULL, feature_send, NULL);
+
+    strcpy(field_message, "timestrap, max_value1_1s, min_value1_1s, \
+max_value1_5s, min_value1_5s, max_value1_30s, min_value1_30s,\
+ave_value1_3s, ave_value1_60s, ave_ratio1, sensor_status1, \
+max_value2_1s, min_value2_1s, max_value2_5s, min_value2_5s, \
+max_value2_30s, min_value2_30s, ave_value2_3s, ave_value2_60s, ave_ratio2, sensor_status2, \
+max_value3_1s, min_value3_1s, max_value3_5s, min_value3_5s, \
+max_value3_30s, min_value3_30s, ave_value3_3s, ave_value3_60s, ave_ratio3, sensor_status3, \
+max_value4_1s, min_value4_1s, max_value4_5s, min_value4_5s, max_value4_30s, min_value4_30s, \
+ave_value4_3s, ave_value4_60s, ave_ratio4, sensor_status4, \
+max_value5_1s, min_value5_1s, max_value5_5s, min_value5_5s, max_value5_30s, min_value5_30s, \
+ave_value5_3s, ave_value5_60s, ave_ratio5, sensor_status5, \
+max_value6_1s, min_value6_1s, max_value6_5s, min_value6_5s, max_value6_30s, min_value6_30s, \
+ave_value6_3s, ave_value6_60s, ave_ratio6, sensor_status6");
+
+    sprintf(value_message, "%f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, \
+%f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, \
+%f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f", \
+    t, max_1s[0], min_1s[0], max_5s[0], min_5s[0], max_30s[0], min_30s[0], ave_3s[0], ave_60s[0], ave_ratio[0], sensor_status, \
+    max_1s[1], min_1s[1], max_5s[1], min_5s[1], max_30s[1], min_30s[1], ave_3s[1], ave_60s[1], ave_ratio[1], sensor_status, \
+    max_1s[2], min_1s[2], max_5s[2], min_5s[2], max_30s[2], min_30s[2], ave_3s[2], ave_60s[2], ave_ratio[2], sensor_status, \
+    max_1s[3], min_1s[3], max_5s[3], min_5s[3], max_30s[3], min_30s[3], ave_3s[3], ave_60s[3], ave_ratio[3], sensor_status, \
+    max_1s[4], min_1s[4], max_5s[4], min_5s[4], max_30s[4], min_30s[4], ave_3s[4], ave_60s[4], ave_ratio[4], sensor_status, \
+    max_1s[5], min_1s[5], max_5s[5], min_5s[5], max_30s[5], min_30s[5], ave_3s[5], ave_60s[5], ave_ratio[5], sensor_status);
+    printf("\n%s\n%s\n", field_message, value_message);
+
     pthread_mutex_lock(&mutex_cal);
-    i =  mysqldb_query_row(mysql, "count(*)", TABLE_NAME3, "1", "1");
+    mysqldb_insert(mysql, TABLE_NAME6, field_message, value_message);
 
-    if(i >= 30){
-        mysqldb_delete(mysql, TABLE_NAME3, "id asc", i-29);
-        i--;
-    }
-    mysqldb_insert(mysql, TABLE_NAME3, "min_data_value1, min_data_value2, min_data_value3, min_data_value4, min_data_value5, min_data_value6", message1);
-    mysqldb_alter(mysql, TABLE_NAME3, "id");
-    //pthread_mutex_unlock(&mutex_min);
+    row_send = mysqldb_query_row(mysql, "count(*)", TABLE_NAME6, "1", "1");
 
-    //pthread_mutex_lock(&mutex_max);
-    j = mysqldb_query_row(mysql, "count(*)", TABLE_NAME4, "1", "1");
-
-    if(j >= 30){
-        mysqldb_delete(mysql, TABLE_NAME4, "id asc", j-29);
-        j--;
-    }
-    mysqldb_insert(mysql, TABLE_NAME4, "max_data_value1, max_data_value2, max_data_value3, max_data_value4, max_data_value5, max_data_value6", message2);
-    mysqldb_alter(mysql, TABLE_NAME4, "id");
-    //pthread_mutex_unlock(&mutex_max);
-
-    //pthread_mutex_lock(&mutex_ave);
-    k = mysqldb_query_row(mysql, "count(*)", TABLE_NAME5, "1", "1");
-
-    if(k >= 60){
-        mysqldb_delete(mysql, TABLE_NAME5, "id asc", k-59);
-        k--;
-    }
-    mysqldb_insert(mysql, TABLE_NAME5, "ave_data_value1, ave_data_value2, ave_data_value3, ave_data_value4, ave_data_value5, ave_data_value6", message3);
-    mysqldb_alter(mysql, TABLE_NAME5, "id");
-    //pthread_mutex_unlock(&mutex_ave);
-
-    l = mysqldb_query_row(mysql, "count(*)", TABLE_NAME6, "1", "1");
-
-    if(l >= 300)
-        mysqldb_delete(mysql, TABLE_NAME6, "timestrap asc", l-299);
-
-    printf("\nok!\n");
-
-    data_cal_change(i+1, j+1, k+1, t);
+    if(row_send >= 300)
+        mysqldb_delete(mysql, TABLE_NAME6, "timestrap asc", row_send-300);
+    
     pthread_mutex_unlock(&mutex_cal);
+    close_connection(mysql);
 
     time_temp4 = get_system_time3f();
     printf("\ndata cal finish time: %f\n", time_temp4);
-
-    close_connection(mysql);
 }

@@ -4,7 +4,7 @@
 #include "../include/searchmax.h"
 #include "../include/getstatus.h"
 
-double sensor_status(double a[], int num, float nominal)
+float get_status(double a[], int num, float nominal)
 {
     int i = 0;
     //double sensor_status = 0;
