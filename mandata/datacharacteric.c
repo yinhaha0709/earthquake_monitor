@@ -16,7 +16,7 @@
 #include "../include/generalSend.h"
 
 float min_1s[6], max_1s[6], min_5s[6], max_5s[6], min_30s[6], max_30s[6], ave_3s[6], ave_60s[6], ave_ratio[6];
-float sensor_status = SENSOR_STATUS;
+float sensor_status[6];
 double timestrap;
 
 /*
@@ -204,6 +204,10 @@ void data_cal_change(int i, int j, int k, double t)
     int x = 0, y=0;
     char field_message[1024], value_message[2048];
     char tunnel = TUNNEL;
+    for(x=0; x<6; x++)
+    {
+        sensor_status[x] = SENSOR_STATUS;
+    }
 
     mysql = mysql_init(NULL);
     if (!mysql) {
@@ -341,12 +345,12 @@ ave_value6_3s, ave_value6_60s, ave_ratio6, sensor_status6");
     sprintf(value_message, "%f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, \
 %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, \
 %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f", \
-    t, max_1s[0], min_1s[0], max_5s[0], min_5s[0], max_30s[0], min_30s[0], ave_3s[0], ave_60s[0], ave_ratio[0], sensor_status, \
-    max_1s[1], min_1s[1], max_5s[1], min_5s[1], max_30s[1], min_30s[1], ave_3s[1], ave_60s[1], ave_ratio[1], sensor_status, \
-    max_1s[2], min_1s[2], max_5s[2], min_5s[2], max_30s[2], min_30s[2], ave_3s[2], ave_60s[2], ave_ratio[2], sensor_status, \
-    max_1s[3], min_1s[3], max_5s[3], min_5s[3], max_30s[3], min_30s[3], ave_3s[3], ave_60s[3], ave_ratio[3], sensor_status, \
-    max_1s[4], min_1s[4], max_5s[4], min_5s[4], max_30s[4], min_30s[4], ave_3s[4], ave_60s[4], ave_ratio[4], sensor_status, \
-    max_1s[5], min_1s[5], max_5s[5], min_5s[5], max_30s[5], min_30s[5], ave_3s[5], ave_60s[5], ave_ratio[5], sensor_status);
+    t, max_1s[0], min_1s[0], max_5s[0], min_5s[0], max_30s[0], min_30s[0], ave_3s[0], ave_60s[0], ave_ratio[0], sensor_status[0], \
+    max_1s[1], min_1s[1], max_5s[1], min_5s[1], max_30s[1], min_30s[1], ave_3s[1], ave_60s[1], ave_ratio[1], sensor_status[1], \
+    max_1s[2], min_1s[2], max_5s[2], min_5s[2], max_30s[2], min_30s[2], ave_3s[2], ave_60s[2], ave_ratio[2], sensor_status[2], \
+    max_1s[3], min_1s[3], max_5s[3], min_5s[3], max_30s[3], min_30s[3], ave_3s[3], ave_60s[3], ave_ratio[3], sensor_status[3], \
+    max_1s[4], min_1s[4], max_5s[4], min_5s[4], max_30s[4], min_30s[4], ave_3s[4], ave_60s[4], ave_ratio[4], sensor_status[4], \
+    max_1s[5], min_1s[5], max_5s[5], min_5s[5], max_30s[5], min_30s[5], ave_3s[5], ave_60s[5], ave_ratio[5], sensor_status[5]);
     printf("\n%s\n%s\n", field_message, value_message);
     mysqldb_insert(mysql, TABLE_NAME6, field_message, value_message);
     close_connection(mysql);

@@ -5,6 +5,7 @@
 #include "../include/config.h"
 #include "../include/stationreg.h"
 #include "../include/mqtt.h"
+#include "../include/cJSON.h"
 
 union union_change
 {
@@ -115,8 +116,36 @@ void station_reg()
     str_long = sizeof("{\"method\":\"thing.service.property.post\",\"id\":\"1000000000\",\"params\":{\"ID\":\"\",\"longitude\":,\"latitude\":,\"strain\":,\"acceleration\":,\"mode\":\"\",\"version\":},\"version\":\"1.0.0\"}") + sizeof(station_id) + sizeof(longitude) + sizeof(latitude) + sizeof(strain) + sizeof(acceleration) + sizeof(mode) + sizeof(version);
     printf("%d\n", str_long);
 
-    my_mqtt_reg(MQTT_TOPIC_PUB, station_id, str_long, longitude, latitude, strain, acceleration, mode, version);
-    my_mqtt_sub(MQTT_TOPIC_SUB);
+    bool session = MQTT_SESSION;
+    struct mosquitto *mosq = NULL;
+    char *clientid = MQTT_CLIENTID;
+    char *ip = MQTT_HOST;
+    int port = MQTT_PORT;
+    int keep_alive = KEEP_ALIVE;
+    cJSON *head = cJSON_CreateObject();
+    cJSON *load = cJSON_CreateObject();
+    int mid = 123;
+
+    char *buf;
+
+    cJSON_AddItemToObject(head, "method", cJSON_CreateString("thing.service.property.set"));
+    cJSON_AddItemToObject(head, "id", cJSON_CreateString("10000"));
+    cJSON_AddItemToObject(head, "params", load);
+    cJSON_AddItemToObject(load, "ID", cJSON_CreateString(station_id));
+    cJSON_AddNumberToObject(load, "longitude", longitude);
+    cJSON_AddNumberToObject(load, "latitude", latitude);
+    cJSON_AddNumberToObject(load, "strain", strain);
+    cJSON_AddNumberToObject(load, "acceleration", acceleration);
+    cJSON_AddItemToObject(load, "mode", cJSON_CreateString(&mode));
+    cJSON_AddItemToObject(load, "version", cJSON_CreateString(&version));
+    cJSON_AddItemToObject(head, "version", cJSON_CreateString("1.0.0"));
+
+    buf = cJSON_Print(head);
+    printf("%s\n", buf);    
+
+    my_mqtt_connect();
+    my_mqtt_publish(MQTT_TOPIC_PUB, buf);
+    my_mqtt_subcribe(MQTT_TOPIC_SUB);
 }
 /*
 int main()

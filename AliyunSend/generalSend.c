@@ -83,12 +83,12 @@ void * generalFeature_Send()
     cJSON_AddNumberToObject(load, "ave_ratio5", ave_ratio[4]);
     cJSON_AddNumberToObject(load, "ave_ratio6", ave_ratio[5]);
 
-    cJSON_AddNumberToObject(load, "sensor_status1", sensor_status);
-    cJSON_AddNumberToObject(load, "sensor_status2", sensor_status);
-    cJSON_AddNumberToObject(load, "sensor_status3", sensor_status);
-    cJSON_AddNumberToObject(load, "sensor_status4", sensor_status);
-    cJSON_AddNumberToObject(load, "sensor_status5", sensor_status);
-    cJSON_AddNumberToObject(load, "sensor_status6", sensor_status);
+    cJSON_AddNumberToObject(load, "sensor_status1", sensor_status[0]);
+    cJSON_AddNumberToObject(load, "sensor_status2", sensor_status[1]);
+    cJSON_AddNumberToObject(load, "sensor_status3", sensor_status[2]);
+    cJSON_AddNumberToObject(load, "sensor_status4", sensor_status[3]);
+    cJSON_AddNumberToObject(load, "sensor_status5", sensor_status[4]);
+    cJSON_AddNumberToObject(load, "sensor_status6", sensor_status[5]);
 
     cJSON_AddItemToObject(head, "version", cJSON_CreateString("1.0.0"));
 

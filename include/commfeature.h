@@ -2,7 +2,7 @@
 #define __COMMFEATURE_H__
 
 void * feature_change(void * arg);
-void * feature_send();
+void * feature_send(void * arg);
 void * common_feature();
 
 #endif

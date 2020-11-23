@@ -224,12 +224,18 @@ void register_send()
     printf("\n");
 
     vibration_mqtt_connect();
-    vibration_subcribe(topic_regsub);
-    vibration_subcribe(topic_ontimesub);
+    vibration_subcribe(topic_regsub, 1);
     while(running)
     {
         vibration_publish(topic_regpub, payload, 32);
         sleep(1);
     }
 
+    vibration_subcribe(topic_ontimesub, 0);
+    /*
+    while(1)
+    {
+        sleep(1);
+    }
+    */
 }

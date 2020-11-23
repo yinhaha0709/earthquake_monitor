@@ -307,9 +307,6 @@ int mysqldb_query(MYSQL *mysql, char *content, char *table_name, char *name, cha
             i++;
             //printf("\n");
         }
-
-        printf("%d\n", i);
-        return i;
     }
 
 /*
@@ -324,6 +321,11 @@ int mysqldb_query(MYSQL *mysql, char *content, char *table_name, char *name, cha
     }
 */
     mysql_free_result(res);
+
+
+    printf("%d\n", i);
+    return i;
+    
 } 
 
 /* 断开mysql连接 */ 

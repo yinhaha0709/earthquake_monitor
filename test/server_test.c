@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include "../include/config.h"
 #include "../include/mqtt.h"
+#include "../include/infoinit.h"
 
 typedef struct VibtationReg_T
 {
@@ -216,16 +217,21 @@ int main(void)
     } 
 
     printf("\n");
-/*
+
     vibration_mqtt_connect();
-    vibration_subcribe(SERVER_REGSUB);
+    vibration_subcribe(SERVER_REGSUB, 1);
+    vibration_subcribe(SERVER_ONTIMESUB, 0);
     while(running)
     {
-        vibration_publish(SERVER_REGPUB, payload);
+        vibration_publish(SERVER_REGPUB, payload, 32);
+        sleep(1);
+    }
+
+    while(1)
+    {
         sleep(1);
     }
 
     vibration_closeconn();
-    */
     return 0;
 }

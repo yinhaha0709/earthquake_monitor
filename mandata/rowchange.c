@@ -10,7 +10,7 @@
 
 void * row_change()
 {
-    MYSQL *mysql;2;
+    MYSQL *mysql;
     int data_row_num_init = 0, data_row_to_delete = 0;
 
     double check_time_temp = get_system_time3f();
@@ -31,7 +31,7 @@ void * row_change()
         mysqldb_delete(mysql, TABLE_NAME1, "timestrap asc", data_row_to_delete);
         //data_row_num_init = 24000;
     }
-    //printf("%d", data_row_num_init);
+    printf("\n%d\n", data_row_num_init);
 
     //mysqldb_update(mysql, MESSAGE_INT, data_row_num_init);
     //printf("check row finish!\n");

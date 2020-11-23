@@ -21,15 +21,15 @@
 #include "../include/Crc16.h"
 #include "../include/infoinit.h"
 #include "../include/register.h"
+#include "../include/idchange.h"
 
-pthread_mutex_t mutex;
+pthread_mutex_t mutex, mutex_row_check, mutex_cal, mutex_min, mutex_max, mutex_ave;;
 float sig_g[6];
 
 union union_change
 {
-    
     uint8_t i_array[4];
-    float    f;
+    float f;
 };
                 
 int main(void)
@@ -42,10 +42,10 @@ int main(void)
     int  i, j, k;
     uint8_t i_data[200];
     float sig_V[6];
-    double sys_time, time_temp1, time_temp2, time_temp3;
+    double sys_time, time_temp1, time_temp2, time_temp3, time_temp4;
     union union_change U1;
     MYSQL *mysql1;
-
+/*
     double c[350];
     for(j=0; j<350; j++)
         c[j] = 0;    
@@ -90,19 +90,20 @@ int main(void)
         perror("tcsetattr");
         return -1;
     }
-
+*/
 /////////////////////////////////////
 
 information_init();
 register_send();
 
 /////////////////////////////////////
-
+/*
     row_count = 0; j = 0;
 
     time_temp1 = get_system_time3f();
     time_temp2 = time_temp1 + 0.5;
     time_temp3 = time_temp1 + 5;
+    time_temp4 = time_temp1 + 7.5;
 
     while(1){
         if(row_count >= 350){
@@ -118,6 +119,11 @@ register_send();
         if((sys_time - time_temp3) >= 1.0){
             pthread_create(&id_t3, NULL, common_feature, NULL);
             time_temp3 = sys_time;        
+        }
+
+        if((sys_time - time_temp4) >= 10.0){
+            pthread_create(&id_t4, NULL, id_change, NULL);
+            time_temp4 = sys_time;
         }
 
     	if((count = read(fd, i_data, 200)) > 0){
@@ -159,4 +165,5 @@ register_send();
             i = 0; j = 0; k = 0;
     	}
     }
+*/ 
 }

@@ -54,13 +54,15 @@
 #define MESSAGE_INT "message_int_content"
 #define SIMPLE_RATE 200
 #define TUNNEL '1'
-#define SENSOR_STATUS 3
+#define SENSOR_STATUS 2.0
 #define KEEP_ALIVE 60
 
 #define ENDIAN 1
 
 #define DATA_PORT "/dev/signal_port"
 #define NET_PORT "/dev/net_port"
+
+#include <pthread.h>
 
 extern double min_check_array[6][30];
 extern double max_check_array[6][30];
@@ -84,6 +86,6 @@ extern struct mosquitto *mosq1;
 extern char station_id[8], mode, version;
 extern float longitude, latitude, strain, acceleration;
 
-extern char *topic_regpub, *topic_regsub, *topic_feature, *topic_ontimepub, *topic_ontimesub, *topic_event;
+extern char topic_regpub[30], topic_regsub[33], topic_feature[29], topic_ontimepub[28], topic_ontimesub[31], topic_event[27];
 
 #endif

@@ -27,6 +27,8 @@ void * feature_change(void * arg)
     int x, y;
     char *table_name = (char *)arg;
 
+    printf("%s\n", table_name);
+
     mysql = mysql_init(NULL);
     if (!mysql) {
         printf("\nMysql init failed.\n");
@@ -43,7 +45,7 @@ void * feature_change(void * arg)
 
         if(row > 30){
             mysqldb_delete(mysql, TABLE_NAME3, "id asc", row - 30);
-            mysqldb_alter(mysql, TABLE_NAME3, "id");
+            //mysqldb_alter(mysql, TABLE_NAME3, "id");
             row = 30;
         }
 
@@ -100,7 +102,7 @@ void * feature_change(void * arg)
         if (row > 30)
         {
             mysqldb_delete(mysql, TABLE_NAME4, "id asc", row - 30);
-            mysqldb_alter(mysql, TABLE_NAME4, "id");
+            //mysqldb_alter(mysql, TABLE_NAME4, "id");
             row = 30;
         }
 
@@ -155,8 +157,8 @@ void * feature_change(void * arg)
 
         if (row > 60)
         {
-            mysqldb_delete(mysql, TABLE_NAME5, "id asc", row - 30);
-            mysqldb_alter(mysql, TABLE_NAME5, "id");
+            mysqldb_delete(mysql, TABLE_NAME5, "id asc", row - 60);
+            //mysqldb_alter(mysql, TABLE_NAME5, "id");
             row = 60;
         }
 
@@ -206,7 +208,7 @@ void * feature_change(void * arg)
     close_connection(mysql);
 }
 
-void * feature_send()
+void * feature_send(void * arg)
 {
     char *type = "fd";
     char endian = ENDIAN;
@@ -216,11 +218,12 @@ void * feature_send()
     uint8_t payload[311];
     memset(payload, 0, 311);
     int i, j;
+    double t1 =*(double *)arg;
 
     memcpy(&payload[0], type, 2);
     memcpy(&payload[2], &data_long, 4);
     memcpy(&payload[6], station_id, 8);
-    memcpy(&payload[14], &timestrap, 8);
+    memcpy(&payload[14], &t1, 8);
     memcpy(&payload[22], &mode, 1);
     i = 23, j = 0;
     for (j = 0; j < 6; j++)
@@ -258,7 +261,7 @@ void * feature_send()
 void * common_feature()
 {
     MYSQL *mysql;
-    double e[6][200], max[6], min[6],  ave[6], time_temp4, t;
+    double e[6][200], max[6], min[6],  ave[6], time_temp4;
     int row = 0, i = 0, row_send = 0;
     float nominal;
     pthread_t id_min, id_max, id_ave, id_featsend;
@@ -266,9 +269,10 @@ void * common_feature()
     char *max_table = TABLE_NAME4;
     char *ave_table = TABLE_NAME5;
     char field_message[1024], value_message[2048];
+    double t;
 
 
-    timestrap = get_system_time();
+    t = get_system_time();
 
     time_temp4 = get_system_time3f();
     printf("\ndata cal start time: %f\n", time_temp4);
@@ -318,7 +322,7 @@ void * common_feature()
     pthread_join(id_max, NULL);
     pthread_join(id_ave, NULL);
 
-    pthread_create(&id_featsend, NULL, feature_send, NULL);
+    pthread_create(&id_featsend, NULL, feature_send, (void *)&t);
 
     strcpy(field_message, "timestrap, max_value1_1s, min_value1_1s, \
 max_value1_5s, min_value1_5s, max_value1_30s, min_value1_30s,\
@@ -337,12 +341,12 @@ ave_value6_3s, ave_value6_60s, ave_ratio6, sensor_status6");
     sprintf(value_message, "%f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, \
 %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, \
 %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f", \
-    t, max_1s[0], min_1s[0], max_5s[0], min_5s[0], max_30s[0], min_30s[0], ave_3s[0], ave_60s[0], ave_ratio[0], sensor_status, \
-    max_1s[1], min_1s[1], max_5s[1], min_5s[1], max_30s[1], min_30s[1], ave_3s[1], ave_60s[1], ave_ratio[1], sensor_status, \
-    max_1s[2], min_1s[2], max_5s[2], min_5s[2], max_30s[2], min_30s[2], ave_3s[2], ave_60s[2], ave_ratio[2], sensor_status, \
-    max_1s[3], min_1s[3], max_5s[3], min_5s[3], max_30s[3], min_30s[3], ave_3s[3], ave_60s[3], ave_ratio[3], sensor_status, \
-    max_1s[4], min_1s[4], max_5s[4], min_5s[4], max_30s[4], min_30s[4], ave_3s[4], ave_60s[4], ave_ratio[4], sensor_status, \
-    max_1s[5], min_1s[5], max_5s[5], min_5s[5], max_30s[5], min_30s[5], ave_3s[5], ave_60s[5], ave_ratio[5], sensor_status);
+    t, max_1s[0], min_1s[0], max_5s[0], min_5s[0], max_30s[0], min_30s[0], ave_3s[0], ave_60s[0], ave_ratio[0], sensor_status[0], \
+    max_1s[1], min_1s[1], max_5s[1], min_5s[1], max_30s[1], min_30s[1], ave_3s[1], ave_60s[1], ave_ratio[1], sensor_status[1], \
+    max_1s[2], min_1s[2], max_5s[2], min_5s[2], max_30s[2], min_30s[2], ave_3s[2], ave_60s[2], ave_ratio[2], sensor_status[2], \
+    max_1s[3], min_1s[3], max_5s[3], min_5s[3], max_30s[3], min_30s[3], ave_3s[3], ave_60s[3], ave_ratio[3], sensor_status[3], \
+    max_1s[4], min_1s[4], max_5s[4], min_5s[4], max_30s[4], min_30s[4], ave_3s[4], ave_60s[4], ave_ratio[4], sensor_status[4], \
+    max_1s[5], min_1s[5], max_5s[5], min_5s[5], max_30s[5], min_30s[5], ave_3s[5], ave_60s[5], ave_ratio[5], sensor_status[5]);
     printf("\n%s\n%s\n", field_message, value_message);
 
     pthread_mutex_lock(&mutex_cal);

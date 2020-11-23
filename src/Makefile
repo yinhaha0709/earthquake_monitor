@@ -2,7 +2,7 @@ inc = ../include
 lib = ../lib
 src = ../src
 
-targets_src = $(lib)/database.o $(lib)/arrayop.o $(lib)/systime.o $(lib)/searchmin.o \
+targets_src = $(lib)/database.o $(lib)/arrayop.o $(lib)/systime.o $(lib)/searchmin.o $(lib)/getstatus.o\
 	$(lib)/searchmax.o $(lib)/searchaverage.o $(lib)/cJSON.o $(lib)/mqtt.o $(lib)/Crc16.o
 
 all: $(targets_src)
@@ -35,6 +35,9 @@ $(lib)/mqtt.o: $(src)/mqtt.c $(inc)/config.h $(inc)/mqtt.h $(inc)/cJSON.h
 
 $(lib)/Crc16.o: $(src)/Crc16.c $(inc)/Crc16.h
 	cc -o $(lib)/Crc16.o -c $(src)/Crc16.c
+
+$(lib)/getstatus.o: $(src)/getstatus.c $(inc)/config.h $(inc)/searchmax.h $(inc)/getstatus.h
+	cc -o $(lib)/getstatus.o -c $(src)/getstatus.c -lm
 
 .PHONY: clean
 clean:

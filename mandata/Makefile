@@ -3,7 +3,7 @@ lib = ../lib
 src = ../src
 man = ../mandata
 
-targets_man = $(lib)/checkrow.o $(lib)/datacharacteric.o $(lib)/eqintensity.o $(lib)/savdata.o $(lib)/stationreg.o
+targets_man = $(lib)/checkrow.o $(lib)/datacharacteric.o $(lib)/eqintensity.o $(lib)/savdata.o $(lib)/stationreg.o $(lib)/rowchange.o $(lib)/sigsave.o $(lib)/idchange.o
 
 all: $(targets_man)
 
@@ -26,6 +26,15 @@ $(lib)/savdata.o: $(man)/savdata.c $(inc)/config.h $(inc)/savdata.h $(inc)/datab
 
 $(lib)/stationreg.o: $(man)/stationreg.c $(inc)/config.h $(inc)/stationreg.h $(inc)/mqtt.h
 	cc -o $(lib)/stationreg.o -c $(man)/stationreg.c
+
+$(lib)/rowchange.o: $(man)/rowchange.c $(inc)/config.h $(inc)/database.h $(inc)/systime.h $(inc)/rowchange.h
+	cc -o $(lib)/rowchange.o -c $(man)/rowchange.c -D_REENTRANT -lpthread -lmysqlclient
+
+$(lib)/sigsave.o: $(man)/sigsave.c $(inc)/config.h $(inc)/sigsave.h $(inc)/database.h $(inc)/systime.h $(inc)/arrayop.h
+	cc -o $(lib)/sigsave.o -c $(man)/sigsave.c -lmysqlclient -lpthread
+
+$(lib)/idchange.o: $(man)/idchange.c $(inc)/config.h $(inc)/database.h $(inc)/systime.h $(inc)/idchange.h
+	cc -o $(lib)/idchange.o -c $(man)/idchange.c -lmysqlclient -lpthread
 
 .PHONY: clean
 clean:

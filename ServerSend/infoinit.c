@@ -8,7 +8,7 @@
 
 char station_id[8], mode, version;
 float longitude, latitude, strain, acceleration;
-char *topic_regpub, *topic_regsub, *topic_feature, *topic_ontimepub, *topic_ontimesub, *topic_event;
+char topic_regpub[30], topic_regsub[33], topic_feature[29], topic_ontimepub[28], topic_ontimesub[31], topic_event[27];
 
 void information_init()
 {
@@ -17,7 +17,7 @@ void information_init()
     FILE *fp;
     int i = 0, j = 0;
     int copy_status = 0;
-    char *topic_head_temp;
+    char topic_head_temp[16];
 
     memset(str, 0, 30);
     memset(temp, 0, 8);
@@ -36,6 +36,8 @@ void information_init()
         if (ch == '\n')
         {
             copy_status = 0;
+
+            //printf("%d\n", j);
 
             switch (i)
             {
@@ -78,7 +80,7 @@ void information_init()
                 memset(str, 0, 30);
                 break;
             case 6:
-                strncpy(version, str, j);
+                strncpy(&version, str, j);
                 version = version - '0';
                 memset(&str, 0, 30);
                 break;
@@ -102,6 +104,27 @@ void information_init()
 
     fclose(fp);
 
+    strcpy(topic_head_temp, MQTT_HEAD);
+    strncat(topic_head_temp, station_id, 8);
+
+    strcpy(topic_regpub, topic_head_temp);
+    strcat(topic_regpub, MQTT_REGPUB);
+
+    strcpy(topic_regsub, topic_head_temp);
+    strcat(topic_regsub, MQTT_REGSUB);
+
+    strcpy(topic_feature, topic_head_temp);
+    strcat(topic_feature, MQTT_FEATURE);
+
+    strcpy(topic_ontimepub, topic_head_temp);
+    strcat(topic_ontimepub, MQTT_ONTIMEPUB);
+
+    strcpy(topic_ontimesub, topic_head_temp);
+    strcat(topic_ontimesub, MQTT_ONTIMESUB);
+
+    strcpy(topic_event, topic_head_temp);
+    strcat(topic_event, MQTT_EVENT);
+/*
     sprintf(topic_head_temp, "%s%s", MQTT_HEAD, station_id);
     sprintf(topic_regpub, "%s%s", topic_head_temp, MQTT_REGPUB);
     sprintf(topic_regsub, "%s%s", topic_head_temp, MQTT_REGSUB);
@@ -109,6 +132,12 @@ void information_init()
     sprintf(topic_ontimepub, "%s%s", topic_head_temp, MQTT_ONTIMEPUB);
     sprintf(topic_ontimesub, "%s%s", topic_head_temp, MQTT_ONTIMESUB);
     sprintf(topic_event, "%s%s", topic_head_temp, MQTT_EVENT);
-
+*/
     printf("%s\n%s\n%s\n%s\n%s\n%s\n", topic_regpub, topic_regsub, topic_feature, topic_ontimepub, topic_ontimesub, topic_event);
 }
+/*
+int main(void)
+{
+    information_init();
+}
+*/
