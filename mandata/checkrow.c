@@ -33,7 +33,7 @@ void * row_check()
     }
     //printf("%d", data_row_num_init);
 
-    mysqldb_update(mysql, MESSAGE_INT, data_row_num_init);
+    mysqldb_update(mysql, MESSAGE_INT, data_row_num_init, 3);
     //printf("check row finish!\n");
     pthread_mutex_unlock(&mutex_row_check);
     close_connection(mysql);

@@ -174,13 +174,13 @@ void mysqldb_delete(MYSQL *mysql, char *table_name, char *field_name, int num)
 }   
 
 /* 更新数据 */
-void mysqldb_update(MYSQL *mysql, char *field_name, int value)
+void mysqldb_update(MYSQL *mysql, char *field_name, int value, int id)
 {  
     int t;
     char *head = "UPDATE ";
     char query[SHORT_BUF_SIZE];
 
-    sprintf(query, "%s%s SET %s=%d WHERE id=1", head, TABLE_NAME2, field_name, value);
+    sprintf(query, "%s%s SET %s=%d WHERE id=%d", head, TABLE_NAME2, field_name, value, id);
     //printf("%s\n", query);
 
     t = mysql_real_query(mysql, query, strlen(query));

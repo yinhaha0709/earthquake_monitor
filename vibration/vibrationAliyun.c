@@ -22,8 +22,11 @@
 #include "../include/registerSend.h"
 #include "../include/ontimeSend.h"
 
-pthread_mutex_t mutex, mutex_row_check, mutex_cal;
+pthread_mutex_t mutex, mutex_row_check, mutex_cal, mutex_min, mutex_max, mutex_ave;;
 float sig_g[6];
+char station_id[8], mode, version;
+float longitude, latitude, strain, acceleration;
+char topic_regpub[30], topic_regsub[33], topic_feature[29], topic_ontimepub[28], topic_ontimesub[31], topic_event[27];
 
 union union_change
 {

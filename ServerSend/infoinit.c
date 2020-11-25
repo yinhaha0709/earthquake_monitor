@@ -6,10 +6,6 @@
 #include "../include/config.h"
 #include "../include/infoinit.h"
 
-char station_id[8], mode, version;
-float longitude, latitude, strain, acceleration;
-char topic_regpub[30], topic_regsub[33], topic_feature[29], topic_ontimepub[28], topic_ontimesub[31], topic_event[27];
-
 void information_init()
 {
     char str[30], temp[8], ch;
@@ -18,6 +14,8 @@ void information_init()
     int i = 0, j = 0;
     int copy_status = 0;
     char topic_head_temp[16];
+    simple_rate = (short)SIMPLE_RATE;
+    simple_num = (short)SIMPLE_NUM;
 
     memset(str, 0, 30);
     memset(temp, 0, 8);
@@ -84,6 +82,14 @@ void information_init()
                 version = version - '0';
                 memset(&str, 0, 30);
                 break;
+            case 7:
+                strncpy(position_num, str, j);
+                printf("%s\n", position_num);
+                memset(str, 0, 30);
+            case 8:
+                strncpy(station_num, str, j);
+                printf("%s\n", station_num);
+                memset(str, 0, 30);
             default:
                 break;
             }

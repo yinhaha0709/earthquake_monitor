@@ -30,8 +30,8 @@ $(lib)/searchaverage.o: $(src)/searchaverage.c $(inc)/searchaverage.h
 $(lib)/cJSON.o:	$(src)/cJSON.c
 	cc -o $(lib)/cJSON.o -c $(src)/cJSON.c -lm
 
-$(lib)/mqtt.o: $(src)/mqtt.c $(inc)/config.h $(inc)/mqtt.h $(inc)/cJSON.h
-	cc -o $(lib)/mqtt.o -c $(src)/mqtt.c -lmosquitto
+$(lib)/mqtt.o: $(src)/mqtt.c $(inc)/config.h $(inc)/mqtt.h $(inc)/cJSON.h $(inc)/database.h
+	cc -o $(lib)/mqtt.o -c $(src)/mqtt.c -lmosquitto -lmysqlclient
 
 $(lib)/Crc16.o: $(src)/Crc16.c $(inc)/Crc16.h
 	cc -o $(lib)/Crc16.o -c $(src)/Crc16.c

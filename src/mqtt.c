@@ -2,15 +2,17 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <mosquitto.h>
+#include <mysql/mysql.h>
+//#include <sys/reboot.h>
 #include <string.h>
 #include "../include/config.h"
+#include "../include/database.h"
 #include "../include/mqtt.h"
 #include "../include/cJSON.h"
 
-int running;
-
-char station_id[8], mode, version;
-float longitude, latitude, strain, acceleration;
+//int running;
+int running, ontime_status, ftp_status, ontime_block_num;
+;
 
 struct mosquitto *mosq = NULL;
 struct mosquitto *mosq1 = NULL;
@@ -41,7 +43,41 @@ typedef struct RegSub_T
         uint8_t byte_auth[2];
     };
 
-}RegSub_t;
+} RegSub_t;
+
+typedef struct OntimeSub_T
+{
+    union
+    {
+        char type_temp[2];
+        uint8_t byte_type[2];
+    };
+
+    union
+    {
+        int long_temp;
+        uint8_t byte_long[4];
+    };
+
+    union
+    {
+        char id_temp[8];
+        uint8_t byte_id[8];
+    };
+
+    union
+    {
+        short ctrl_command;
+        uint8_t byte_ctrl[2];
+    };
+
+    union
+    {
+        char ctrl_word;
+        uint8_t byte_word;
+    };
+
+} OntimeSub_t;
 
 void my_mqtt_connect()
 {
@@ -55,7 +91,8 @@ void my_mqtt_connect()
     mosquitto_lib_init();
     mosq = mosquitto_new(clientid, session, NULL);
 
-    if(!mosq){
+    if (!mosq)
+    {
         printf("mqttpub_connect create() failed\n");
         mosquitto_destroy(mosq);
         mosquitto_lib_cleanup();
@@ -65,14 +102,16 @@ void my_mqtt_connect()
 
     //mosquitto_message_callback_set(mosq, my_message_callback);
 
-    if(mosquitto_username_pw_set(mosq, MQTT_USER, MQTT_PASSWORD) != MOSQ_ERR_SUCCESS){
+    if (mosquitto_username_pw_set(mosq, MQTT_USER, MQTT_PASSWORD) != MOSQ_ERR_SUCCESS)
+    {
         printf("user and passwd fail!\n");
         mosquitto_destroy(mosq);
         mosquitto_lib_cleanup();
         return;
     }
-    
-    if(mosquitto_connect(mosq, ip, port, keep_alive) != MOSQ_ERR_SUCCESS){
+
+    if (mosquitto_connect(mosq, ip, port, keep_alive) != MOSQ_ERR_SUCCESS)
+    {
         printf("mosqpub_connect() failed\n");
         mosquitto_destroy(mosq);
         mosquitto_lib_cleanup();
@@ -81,20 +120,21 @@ void my_mqtt_connect()
     printf("connect %s:%d successfully!\n", ip, port);
 
     int loop = mosquitto_loop_start(mosq);
-    if(loop != MOSQ_ERR_SUCCESS){
+    if (loop != MOSQ_ERR_SUCCESS)
+    {
         printf("mosquitto loop error\n");
         mosquitto_destroy(mosq);
         mosquitto_lib_cleanup();
         return;
     }
-
 }
 
 void my_mqtt_publish(char *topic, char *payload)
 {
     int mid = 123;
 
-    if(mosquitto_publish(mosq, &mid, topic, strlen(payload)+1, payload, 0, 0) != MOSQ_ERR_SUCCESS){
+    if (mosquitto_publish(mosq, &mid, topic, strlen(payload) + 1, payload, 0, 0) != MOSQ_ERR_SUCCESS)
+    {
         printf("mqttpub_publish() error\n");
         mosquitto_destroy(mosq);
         mosquitto_lib_cleanup();
@@ -117,7 +157,8 @@ void my_mqtt_subcribe(char *topic)
     mosquitto_lib_init();
     mosq = mosquitto_new(clientid, session, NULL);
 
-    if(!mosq){
+    if (!mosq)
+    {
         printf("mqttpub_connect create() failed\n");
         mosquitto_destroy(mosq);
         mosquitto_lib_cleanup();
@@ -127,14 +168,16 @@ void my_mqtt_subcribe(char *topic)
 
     mosquitto_message_callback_set(mosq, my_message_callback);
 
-    if(mosquitto_username_pw_set(mosq, MQTT_USER, MQTT_PASSWORD) != MOSQ_ERR_SUCCESS){
+    if (mosquitto_username_pw_set(mosq, MQTT_USER, MQTT_PASSWORD) != MOSQ_ERR_SUCCESS)
+    {
         printf("user and passwd fail!\n");
         mosquitto_destroy(mosq);
         mosquitto_lib_cleanup();
         return;
     }
-    
-    if(mosquitto_connect(mosq, ip, port, keep_alive) != MOSQ_ERR_SUCCESS){
+
+    if (mosquitto_connect(mosq, ip, port, keep_alive) != MOSQ_ERR_SUCCESS)
+    {
         printf("mosqpub_connect() failed\n");
         mosquitto_destroy(mosq);
         mosquitto_lib_cleanup();
@@ -143,7 +186,8 @@ void my_mqtt_subcribe(char *topic)
     printf("connect %s:%d successfully!\n", ip, port);
 
     int loop = mosquitto_loop_start(mosq);
-    if(loop != MOSQ_ERR_SUCCESS){
+    if (loop != MOSQ_ERR_SUCCESS)
+    {
         printf("mosquitto loop error\n");
         mosquitto_destroy(mosq);
         mosquitto_lib_cleanup();
@@ -151,7 +195,8 @@ void my_mqtt_subcribe(char *topic)
     }
     running = 1;
 
-    if(mosquitto_subscribe(mosq, NULL, topic, 0) != MOSQ_ERR_SUCCESS){
+    if (mosquitto_subscribe(mosq, NULL, topic, 0) != MOSQ_ERR_SUCCESS)
+    {
         printf("mqttsub_test() error\n");
         mosquitto_destroy(mosq);
         mosquitto_lib_cleanup();
@@ -162,7 +207,7 @@ void my_mqtt_subcribe(char *topic)
         printf("subcribe qos0 success!\n");
     }
 
-    while(running)
+    while (running)
     {
         sleep(1);
     }
@@ -178,7 +223,6 @@ void my_message_callback(struct mosquitto *mosq, void *obj, const struct mosquit
     running = 0;
     mosquitto_disconnect(mosq);
 }
-
 
 void my_mqtt_closeconn()
 {
@@ -203,7 +247,8 @@ void vibration_mqtt_connect()
     mosquitto_lib_init();
     mosq1 = mosquitto_new(clientid, session, NULL);
 
-    if(!mosq1){
+    if (!mosq1)
+    {
         printf("mqttpub_connect create() failed\n");
         mosquitto_destroy(mosq1);
         mosquitto_lib_cleanup();
@@ -213,15 +258,17 @@ void vibration_mqtt_connect()
 
     mosquitto_message_callback_set(mosq1, vibration_message_callback);
 
-    if(mosquitto_username_pw_set(mosq1, SERVER_USER, SERVER_PASSWORD) != MOSQ_ERR_SUCCESS){
+    if (mosquitto_username_pw_set(mosq1, SERVER_USER, SERVER_PASSWORD) != MOSQ_ERR_SUCCESS)
+    {
         printf("user and passwd fail!\n");
         mosquitto_destroy(mosq1);
         mosquitto_lib_cleanup();
         return;
     }
-    
-    if(mosquitto_connect(mosq1, ip, port, keep_alive) != MOSQ_ERR_SUCCESS){
-        printf("mosqpub_connect() failed\n");
+
+    if (mosquitto_connect(mosq1, ip, port, keep_alive) != MOSQ_ERR_SUCCESS)
+    {
+        printf("mosq_connect() failed\n");
         mosquitto_destroy(mosq1);
         mosquitto_lib_cleanup();
         return;
@@ -229,20 +276,21 @@ void vibration_mqtt_connect()
     printf("connect %s:%d successfully!\n", ip, port);
 
     int loop = mosquitto_loop_start(mosq1);
-    if(loop != MOSQ_ERR_SUCCESS){
+    if (loop != MOSQ_ERR_SUCCESS)
+    {
         printf("mosquitto loop error\n");
         mosquitto_destroy(mosq1);
         mosquitto_lib_cleanup();
         return;
     }
-
 }
 
 void vibration_publish(char *topic, uint8_t *payload, int byte_size)
 {
     int mid = 123;
 
-    if(mosquitto_publish(mosq1, &mid, topic, byte_size, payload, 1, 0) != MOSQ_ERR_SUCCESS){
+    if (mosquitto_publish(mosq1, &mid, topic, byte_size, payload, 1, 0) != MOSQ_ERR_SUCCESS)
+    {
         printf("mqttpub error\n");
         mosquitto_destroy(mosq1);
         mosquitto_lib_cleanup();
@@ -259,7 +307,8 @@ void vibration_subcribe(char *topic, int qos)
     //struct mosquitto *mosq = NULL;
     //running = 1;
 
-    if(mosquitto_subscribe(mosq1, NULL, topic, qos) != MOSQ_ERR_SUCCESS){
+    if (mosquitto_subscribe(mosq1, NULL, topic, qos) != MOSQ_ERR_SUCCESS)
+    {
         printf("mqttsub error\n");
         mosquitto_destroy(mosq1);
         mosquitto_lib_cleanup();
@@ -270,7 +319,7 @@ void vibration_subcribe(char *topic, int qos)
         printf("subcribe success!\n");
         running = 1;
     }
-/*
+    /*
     while(1)
     {
         sleep(1);
@@ -282,32 +331,116 @@ void vibration_message_callback(struct mosquitto *mosq1, void *obj, const struct
 {
     //printf("get\n");
     printf("receive a message of %s: ", (char *)msg->topic);
-    
-    if(strcmp((char *)msg->topic, SERVER_REGSUB) == 0){
+
+    if (strcmp((char *)msg->topic, topic_regsub) == 0)
+    {
 
         RegSub_t RegSub_temp;
 
         memcpy(RegSub_temp.byte_type, msg->payload, 2);
-        memcpy(RegSub_temp.byte_long, msg->payload+2, 4);
-        memcpy(RegSub_temp.byte_id, msg->payload+6, 8);
-        memcpy(RegSub_temp.byte_auth, msg->payload+14, 2);
+        memcpy(RegSub_temp.byte_long, msg->payload + 2, 4);
+        memcpy(RegSub_temp.byte_id, msg->payload + 6, 8);
+        memcpy(RegSub_temp.byte_auth, msg->payload + 14, 2);
         //printf("start\n");
 
         printf("%s %d %s %d\n", RegSub_temp.type_temp, RegSub_temp.long_temp, RegSub_temp.id_temp, RegSub_temp.auth_temp);
 
         //printf("%d %d %d\n", strncmp(RegSub_temp.type_temp, "rr", 2), strncmp(RegSub_temp.id_temp, station_id, 8), RegSub_temp.auth_temp);
 
-        if((strncmp(RegSub_temp.type_temp, "rr", 2) == 0) && (strncmp(RegSub_temp.id_temp, station_id, 8) == 0) && RegSub_temp.auth_temp == 0){
+        if ((strncmp(RegSub_temp.type_temp, "rr", 2) == 0) && (strncmp(RegSub_temp.id_temp, station_id, 8) == 0) && RegSub_temp.auth_temp == 0)
+        {
             running = 0;
         }
     }
     //running = 0;
     //mosquitto_disconnect(mosq1);
+
+    if (strcmp((char *)msg->topic, topic_ontimesub) == 0)
+    {
+
+        OntimeSub_t OntimeSub_temp;
+        int i = 0;
+
+        memcpy(OntimeSub_temp.byte_type, msg->payload, 2);
+        memcpy(OntimeSub_temp.byte_long, msg->payload + 2, 4);
+        memcpy(OntimeSub_temp.byte_id, msg->payload + 6, 8);
+        memcpy(OntimeSub_temp.byte_ctrl, msg->payload + 14, 2);
+        memcpy(&OntimeSub_temp.byte_word, msg->payload + 16, 1);
+
+        printf("%s %d %s %d %c\n", OntimeSub_temp.type_temp, OntimeSub_temp.long_temp, OntimeSub_temp.id_temp, OntimeSub_temp.ctrl_command, OntimeSub_temp.ctrl_word);
+
+        if ((strncmp(OntimeSub_temp.type_temp, "cc", 2) == 0) && (strncmp(OntimeSub_temp.id_temp, station_id, 8) == 0))
+        {
+            //printf("round 1\n");
+            if (OntimeSub_temp.ctrl_command == 1)
+            {
+
+                MYSQL *mysql;
+
+                mysql = mysql_init(NULL);
+                if (!mysql)
+                {
+                    printf("\nMysql init failed.\n");
+                }
+
+                mysqldb_connect(mysql);
+
+                //printf("type 1\n");
+                if (OntimeSub_temp.ctrl_word == 0)
+                {
+                    ontime_status = 0;
+                    mysqldb_update(mysql, MESSAGE_INT, ontime_status, 1);
+                    ontime_block_num = 0;
+                    //printf("status 1-0\n");
+                }
+                else if (OntimeSub_temp.ctrl_word == 1)
+                {
+                    ontime_status = 1;
+                    mysqldb_update(mysql, MESSAGE_INT, ontime_status, 1);
+                    //printf("status1-1\n");
+                }
+
+                close_connection(mysql);
+            }
+            else if (OntimeSub_temp.ctrl_command == 2)
+            {
+                MYSQL *mysql;
+                //printf("type 2\n");
+                mysql = mysql_init(NULL);
+                if (!mysql)
+                {
+                    printf("\nMysql init failed.\n");
+                }
+
+                mysqldb_connect(mysql);
+
+                if (OntimeSub_temp.ctrl_word == 0)
+                {
+                    //printf("status 2-0\n");
+                    ftp_status = 0;
+                    mysqldb_update(mysql, MESSAGE_INT, ftp_status, 2);
+                }
+                else if (OntimeSub_temp.ctrl_word == 1)
+                {
+                    //printf("status 2-1\n");
+                    ftp_status = 1;
+                    mysqldb_update(mysql, MESSAGE_INT, ftp_status, 2);
+                }
+
+                close_connection(mysql);
+            }
+            else if (OntimeSub_temp.ctrl_command == 3)
+            {
+                sync();
+                system("reboot");
+            }
+        }
+    }
+
     printf("\n");
 
     fflush(stdout);
 }
-
 
 void vibration_closeconn()
 {

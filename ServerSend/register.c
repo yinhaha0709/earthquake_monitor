@@ -215,14 +215,14 @@ void register_send()
     memcpy(&payload[26], Reg_temp.byte_acceleration, 4);
     memcpy(&payload[30], &Reg_temp.byte_mode, 1);
     memcpy(&payload[31], &Reg_temp.byte_version, 1);
-
+/*
     for(i=0; i<32; i++)
     {
         printf("%x ", payload[i]);
     } 
 
     printf("\n");
-
+*/
     vibration_mqtt_connect();
     vibration_subcribe(topic_regsub, 1);
     while(running)
@@ -232,10 +232,10 @@ void register_send()
     }
 
     vibration_subcribe(topic_ontimesub, 0);
-    /*
+/*    
     while(1)
     {
         sleep(1);
     }
-    */
+*/    
 }

@@ -53,6 +53,7 @@
 
 #define MESSAGE_INT "message_int_content"
 #define SIMPLE_RATE 200
+#define SIMPLE_NUM 50
 #define TUNNEL '1'
 #define SENSOR_STATUS 2.0
 #define KEEP_ALIVE 60
@@ -85,6 +86,12 @@ extern struct mosquitto *mosq1;
 
 extern char station_id[8], mode, version;
 extern float longitude, latitude, strain, acceleration;
+extern char position_num[2], station_num[2];
+extern char threshold_status[6];
+
+extern short int simple_rate, simple_num;
+extern int running, ontime_status, ftp_status;
+extern int ontime_block_num;
 
 extern char topic_regpub[30], topic_regsub[33], topic_feature[29], topic_ontimepub[28], topic_ontimesub[31], topic_event[27];
 

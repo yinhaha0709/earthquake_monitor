@@ -56,6 +56,11 @@ mysql -u${USER} -p${PASSWORD} -D${DATABASE} -e"${create_table6_sql}"
 [ $? -eq 0 ]&& echo "created table6 success" || echo "Table6 already exist"
 
 #insert data
-insert_sql="INSERT INTO ${TABLE2} (id, message_introduction, message_int_content, message_double_content) VALUES (1, 'total row of ontime signal', 0, 0)"
-mysql -u${USER} -p${PASSWORD} -D${DATABASE} -e"${insert_sql}"
-[ $? -eq 0 ]&& echo "data insert success" || echo "data already exist"
+insert1_sql="INSERT INTO ${TABLE2} (id, message_introduction, message_int_content, message_double_content) VALUES (1, 'ontime_status', 0, 0)"
+insert2_sql="INSERT INTO ${TABLE2} (id, message_introduction, message_int_content, message_double_content) VALUES (2, 'ftp_status', 1, 0)"
+
+mysql -u${USER} -p${PASSWORD} -D${DATABASE} -e"${insert1_sql}"
+[ $? -eq 0 ]&& echo "data1 insert success" || echo "data1 already exist"
+
+mysql -u${USER} -p${PASSWORD} -D${DATABASE} -e"${insert2_sql}"
+[ $? -eq 0 ]&& echo "data2 insert success" || echo "data2 already exist"

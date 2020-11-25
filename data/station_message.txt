@@ -5,3 +5,6 @@ strain: 2.0
 acceleration: 5.0
 mode: 1
 version: 0
+position_num: 01
+station_num: GD
+

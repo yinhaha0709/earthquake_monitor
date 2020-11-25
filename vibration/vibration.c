@@ -13,7 +13,7 @@
 #include "../include/config.h"
 #include "../include/systime.h"
 //#include "../include/arrayop.h"
-//#include "../include/database.h"
+#include "../include/database.h"
 #include "../include/sigsave.h"
 #include "../include/rowchange.h"
 #include "../include/commfeature.h"
@@ -22,9 +22,17 @@
 #include "../include/infoinit.h"
 #include "../include/register.h"
 #include "../include/idchange.h"
+#include "../include/ontime.h"
 
-pthread_mutex_t mutex, mutex_row_check, mutex_cal, mutex_min, mutex_max, mutex_ave;;
+pthread_mutex_t mutex, mutex_row_check, mutex_cal, mutex_min, mutex_max, mutex_ave;
 float sig_g[6];
+double timestrap;
+char station_id[8], mode, version;
+float longitude, latitude, strain, acceleration;
+short int simple_rate, simple_num;
+char position_num[2], station_num[2];
+char topic_regpub[30], topic_regsub[33], topic_feature[29], topic_ontimepub[28], topic_ontimesub[31], topic_event[27];
+char threshold_status[6];
 
 union union_change
 {
@@ -35,7 +43,7 @@ union union_change
 int main(void)
 {
     int fd;
-    pthread_t id_t1, id_t2, id_t3, id_t4;
+    pthread_t id_t1, id_t2, id_t3, id_t4, id_t5;
     struct termios old_cfg, new_cfg;
     int speed;
     int count, row_count, crc_check;
@@ -45,7 +53,25 @@ int main(void)
     double sys_time, time_temp1, time_temp2, time_temp3, time_temp4;
     union union_change U1;
     MYSQL *mysql1;
-/*
+
+    mysql1 = mysql_init(NULL); 
+    if (!mysql1) {
+        printf("\nMysql init failed.\n");
+    }
+
+    mysqldb_connect(mysql1);
+
+    ontime_status = mysqldb_query_row(mysql1, MESSAGE_INT, TABLE_NAME2, "id", "1");
+    ftp_status = mysqldb_query_row(mysql1, MESSAGE_INT, TABLE_NAME2, "id", "2");
+
+    printf("%d, %d\n", ontime_status, ftp_status);
+    close_connection(mysql1);
+
+    running = 0, ontime_block_num = 0;
+    for(i=0; i<6; i++)
+        threshold_status[i] = 0;
+    
+
     double c[350];
     for(j=0; j<350; j++)
         c[j] = 0;    
@@ -90,14 +116,14 @@ int main(void)
         perror("tcsetattr");
         return -1;
     }
-*/
-/////////////////////////////////////
-
-information_init();
-register_send();
 
 /////////////////////////////////////
-/*
+
+    information_init();
+    register_send();
+
+/////////////////////////////////////
+
     row_count = 0; j = 0;
 
     time_temp1 = get_system_time3f();
@@ -109,6 +135,11 @@ register_send();
         if(row_count >= 350){
             row_count = 0;
             pthread_create(&id_t1, NULL, signal_save, (void*)&c);
+
+            if(ontime_status == 1){
+                //ontime_block_num++;
+                pthread_create(&id_t5, NULL, ontime_send, (void*)&c);
+            }
         }
 
         if((sys_time - time_temp2) >= 5.0){
@@ -121,7 +152,7 @@ register_send();
             time_temp3 = sys_time;        
         }
 
-        if((sys_time - time_temp4) >= 10.0){
+        if((sys_time - time_temp4) >= 30.0){
             pthread_create(&id_t4, NULL, id_change, NULL);
             time_temp4 = sys_time;
         }
@@ -144,8 +175,8 @@ register_send();
                     }
 
                     sig_g[0] = (sig_V[0] - 1.500000) / 0.300000;
-                    sig_g[1] = (sig_V[1] - 1.500000) / 0.300000;
-                    sig_g[2] = ((sig_V[2] - 1.500000) / 0.300000) - 1.0;
+                    sig_g[1] = (sig_V[1] - 1.500000) / 0.300000 + 0.04;
+                    sig_g[2] = ((sig_V[2] - 1.500000) / 0.300000) - 1.09;
                     sig_g[3] = (sig_V[3] - 2.500000) / 1.250000;
                     sig_g[4] = (sig_V[4] - 2.500000) / 1.250000;
                     sig_g[5] = ((sig_V[5] - 2.500000) / 1.250000) + 1.0;
@@ -165,5 +196,5 @@ register_send();
             i = 0; j = 0; k = 0;
     	}
     }
-*/ 
+
 }

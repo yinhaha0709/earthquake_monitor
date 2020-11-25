@@ -15,7 +15,6 @@
 #include "../include/commfeature.h"
 
 float min_1s[6], max_1s[6], min_5s[6], max_5s[6], min_30s[6], max_30s[6], ave_3s[6], ave_60s[6], ave_ratio[6], sensor_status[6];
-double timestrap;
 char message1[60], message2[60], message3[60];
 
 void * feature_change(void * arg)
@@ -230,7 +229,10 @@ void * feature_send(void * arg)
     {
         num = j + 1;
         num_next = j + 2;
-        tunnel = j + 1;
+        if(j >=5)
+            num_next = 0;
+        tunnel = num;
+        
         memcpy(&payload[i], &num, 1);
         memcpy(&payload[i + 1], &num_next, 1);
         memcpy(&payload[i + 2], &endian, 1);
