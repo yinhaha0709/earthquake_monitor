@@ -231,7 +231,7 @@ void register_send()
         sleep(1);
     }
 
-    vibration_subcribe(topic_ontimesub, 0);
+    vibration_subcribe(topic_ontimesub, 1);
 /*    
     while(1)
     {

@@ -5,6 +5,8 @@
 #include <stdint.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <syslog.h>
+#include <errno.h>
 #include <termios.h>
 //#include <mosquitto.h>
 #include <string.h>
@@ -53,6 +55,14 @@ int main(void)
     double sys_time, time_temp1, time_temp2, time_temp3, time_temp4;
     union union_change U1;
     MYSQL *mysql1;
+    static unsigned char food = 0;
+
+    fd_watchdog = open("/dev/watchdog", O_WRONLY);
+    if(fd_watchdog == -1){
+        int err = errno;
+        printf("\n!!!FAILED to open /dev/watchdog, errno: %d\n", err);
+        syslog(LOG_WARNING, "FAILED to open /dev/watchdog, errno: %d\n", err);
+    }
 
     mysql1 = mysql_init(NULL); 
     if (!mysql1) {
@@ -153,12 +163,14 @@ int main(void)
         }
 
         if((sys_time - time_temp4) >= 30.0){
+            //mosquitto_reconnect(mosq1);
             pthread_create(&id_t4, NULL, id_change, NULL);
             time_temp4 = sys_time;
         }
 
     	if((count = read(fd, i_data, 200)) > 0){
             if((i_data[0] == 0x70) && (i_data[1] == 0x03) && (i_data[2] == 0x18)){
+                ssize_t eaten = write(fd_watchdog, &food, 1);
                 if((crc_check = calc_crc16(i_data, count)) == 0){
 
                     sys_time = get_system_time3f();
@@ -174,12 +186,12 @@ int main(void)
 			//printf("\n%x %x %x %x\n", i_data[i], i_data[i+1], i_data[i+2], i_data[i+3]);
                     }
 
-                    sig_g[0] = (sig_V[0] - 1.500000) / 0.300000;
-                    sig_g[1] = (sig_V[1] - 1.500000) / 0.300000 + 0.04;
-                    sig_g[2] = ((sig_V[2] - 1.500000) / 0.300000) - 1.09;
-                    sig_g[3] = (sig_V[3] - 2.500000) / 1.250000;
-                    sig_g[4] = (sig_V[4] - 2.500000) / 1.250000;
-                    sig_g[5] = ((sig_V[5] - 2.500000) / 1.250000) + 1.0;
+                    sig_g[0] = (sig_V[0] - 0.9444) / 0.4291;
+                    sig_g[1] = (sig_V[1] - 0.9293) / 0.4184;
+                    sig_g[2] = ((sig_V[2] - 0.9470) / 0.40038) - 1.0;
+                    sig_g[3] = (sig_V[3] - 2.5773) / 1.2788;
+                    sig_g[4] = (sig_V[4] - 2.5880) / 1.2821;
+                    sig_g[5] = ((sig_V[5] - 2.6043) / 1.2944) + 1.0;
 
 
                     c[row_count] = sys_time;

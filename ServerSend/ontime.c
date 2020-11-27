@@ -71,13 +71,13 @@ void * ontime_send(void * arg)
 
         j = j + 209;
     }
-
+/*
     for(i=0; i<ontime_long; i++)
     {
         printf("%x", payload[i]);
     }
-
-    printf("\n");
+*/
+    printf("ontime send ok\n");
 
     vibration_publish(topic_ontimepub, payload, ontime_long);
 }

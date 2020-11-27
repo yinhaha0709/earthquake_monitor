@@ -25,6 +25,11 @@ TABLE5="data_ave"
 #TABLE5_6="data_ave6"
 TABLE6="data_send"
 ##################################
+#drop database
+drop_db_sql="DROP DATABASE $DATABASE"
+mysql -u${USER} -p${PASSWORD} -e"${drop_db_sql}"
+[ $? -eq 0 ]&& echo "drop db success" || echo "drop db failed"
+
 #create database
 create_db_sql="CREATE DATABASE $DATABASE"
 mysql -u${USER} -p${PASSWORD} -e"${create_db_sql}"

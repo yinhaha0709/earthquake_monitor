@@ -95,4 +95,6 @@ extern int ontime_block_num;
 
 extern char topic_regpub[30], topic_regsub[33], topic_feature[29], topic_ontimepub[28], topic_ontimesub[31], topic_event[27];
 
+extern int fd_watchdog;
+
 #endif

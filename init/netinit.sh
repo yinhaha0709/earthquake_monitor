@@ -13,5 +13,9 @@ sleep 1
 echo $PASSWD | sudo -S echo -e "AT\$QCRMCALL=1,1\r" > $net_port
 sleep 1
 echo $PASSWD | sudo -S udhcpc -i wwan0
+sleep 1
+echo $PASSWD | sudo -S ifmetric wwan0 600
+sleep 1
+echo $PASSWD | sudo -S ifmetric eth0 1
 
 

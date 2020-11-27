@@ -15,7 +15,7 @@
 #include "../include/commfeature.h"
 
 float min_1s[6], max_1s[6], min_5s[6], max_5s[6], min_30s[6], max_30s[6], ave_3s[6], ave_60s[6], ave_ratio[6], sensor_status[6];
-char message1[60], message2[60], message3[60];
+char message1[100], message2[100], message3[100];
 
 void * feature_change(void * arg)
 {
@@ -251,11 +251,13 @@ void * feature_send(void * arg)
 
         i = i + 48;
     }
-
+/*
     for(i = 0; i < data_long; i++)
     {
         printf("%x ", payload[i]);
     }
+*/
+    printf("feature send ok !");
 
     vibration_publish(topic_feature, payload, data_long);
 }
@@ -308,9 +310,9 @@ void * common_feature()
         sensor_status[row] = get_status(e[row], 200, nominal);
     }
 
-    memset(message1, 0, 60);
-    memset(message2, 0, 60);
-    memset(message3, 0, 60);
+    memset(message1, 0, 100);
+    memset(message2, 0, 100);
+    memset(message3, 0, 100);
 
     sprintf(message1, "%f, %f, %f, %f, %f, %f", min[0], min[1], min[2], min[3], min[4], min[5]);
     sprintf(message2, "%f, %f, %f, %f, %f, %f", max[0], max[1], max[2], max[3], max[4], max[5]);
@@ -349,7 +351,7 @@ ave_value6_3s, ave_value6_60s, ave_ratio6, sensor_status6");
     max_1s[3], min_1s[3], max_5s[3], min_5s[3], max_30s[3], min_30s[3], ave_3s[3], ave_60s[3], ave_ratio[3], sensor_status[3], \
     max_1s[4], min_1s[4], max_5s[4], min_5s[4], max_30s[4], min_30s[4], ave_3s[4], ave_60s[4], ave_ratio[4], sensor_status[4], \
     max_1s[5], min_1s[5], max_5s[5], min_5s[5], max_30s[5], min_30s[5], ave_3s[5], ave_60s[5], ave_ratio[5], sensor_status[5]);
-    printf("\n%s\n%s\n", field_message, value_message);
+    //printf("\n%s\n%s\n", field_message, value_message);
 
     pthread_mutex_lock(&mutex_cal);
     mysqldb_insert(mysql, TABLE_NAME6, field_message, value_message);

@@ -12,7 +12,7 @@
 
 //int running;
 int running, ontime_status, ftp_status, ontime_block_num;
-;
+int fd_watchdog;
 
 struct mosquitto *mosq = NULL;
 struct mosquitto *mosq1 = NULL;
@@ -119,7 +119,7 @@ void my_mqtt_connect()
     }
     printf("connect %s:%d successfully!\n", ip, port);
 
-    int loop = mosquitto_loop_start(mosq);
+    int loop = mosquitto_loop_forever(mosq, 5000, 1);
     if (loop != MOSQ_ERR_SUCCESS)
     {
         printf("mosquitto loop error\n");
@@ -143,6 +143,9 @@ void my_mqtt_publish(char *topic, char *payload)
     else
     {
         printf("publish qos0 success!\n\n");
+        ///////////////////////////////////////////
+
+        ///////////////////////////////////////////
     }
 }
 
@@ -256,6 +259,7 @@ void vibration_mqtt_connect()
     }
     printf("create mosquitto successfully!\n");
 
+    mosquitto_publish_callback_set(mosq1, vibration_publish_callback);
     mosquitto_message_callback_set(mosq1, vibration_message_callback);
 
     if (mosquitto_username_pw_set(mosq1, SERVER_USER, SERVER_PASSWORD) != MOSQ_ERR_SUCCESS)
@@ -271,7 +275,7 @@ void vibration_mqtt_connect()
         printf("mosq_connect() failed\n");
         mosquitto_destroy(mosq1);
         mosquitto_lib_cleanup();
-        return;
+        exit(0);
     }
     printf("connect %s:%d successfully!\n", ip, port);
 
@@ -298,7 +302,10 @@ void vibration_publish(char *topic, uint8_t *payload, int byte_size)
     }
     else
     {
-        printf("publish qos1 success!\n\n");
+        printf("publish qos1 start!\n\n");
+        ///////////////////////////////////////////
+
+        ///////////////////////////////////////////
     }
 }
 
@@ -312,7 +319,7 @@ void vibration_subcribe(char *topic, int qos)
         printf("mqttsub error\n");
         mosquitto_destroy(mosq1);
         mosquitto_lib_cleanup();
-        return;
+        exit(0);
     }
     else
     {
@@ -325,6 +332,11 @@ void vibration_subcribe(char *topic, int qos)
         sleep(1);
     }
 */
+}
+
+void vibration_publish_callback(struct mosquitto *mosq1, void *obj, int mid)
+{
+    printf("publish finish\n");
 }
 
 void vibration_message_callback(struct mosquitto *mosq1, void *obj, const struct mosquitto_message *msg)
@@ -432,6 +444,8 @@ void vibration_message_callback(struct mosquitto *mosq1, void *obj, const struct
             else if (OntimeSub_temp.ctrl_command == 3)
             {
                 sync();
+                vibration_closeconn();
+                close(fd_watchdog);
                 system("reboot");
             }
         }
@@ -445,7 +459,7 @@ void vibration_message_callback(struct mosquitto *mosq1, void *obj, const struct
 void vibration_closeconn()
 {
     mosquitto_disconnect(mosq1);
-    mosquitto_loop_stop(mosq1, false);
+    mosquitto_loop_stop(mosq, false);
     mosquitto_destroy(mosq1);
     mosquitto_lib_cleanup();
     printf("mqtt close\n");
