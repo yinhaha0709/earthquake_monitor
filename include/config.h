@@ -1,9 +1,9 @@
 #ifndef __CONFIG_H__
 #define __CONFIG_H__
 
-//#include <mosquitto.h>
-//#include <mysql/mysql.h>
-//#include <pthread.h>
+#include <mosquitto.h>
+#include <mysql/mysql.h>
+#include <pthread.h>
 
 #define SHORT_BUF_SIZE 1024
 #define LONG_BUF_SIZE 2048
@@ -63,7 +63,7 @@
 #define DATA_PORT "/dev/signal_port"
 #define NET_PORT "/dev/net_port"
 
-#include <pthread.h>
+//#include <pthread.h>
 
 extern double min_check_array[6][30];
 extern double max_check_array[6][30];
@@ -83,6 +83,8 @@ extern pthread_mutex_t mutex, mutex_row_check, mutex_cal, mutex_min, mutex_max, 
 
 extern struct mosquitto *mosq;
 extern struct mosquitto *mosq1;
+
+extern MYSQL *mysql;
 
 extern char station_id[8], mode, version;
 extern float longitude, latitude, strain, acceleration;

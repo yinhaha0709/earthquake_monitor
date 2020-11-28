@@ -10,19 +10,19 @@
 
 void * row_change()
 {
-    MYSQL *mysql;
+    //MYSQL *mysql;
     int data_row_num_init = 0, data_row_to_delete = 0;
 
     double check_time_temp = get_system_time3f();
     printf("check row start: %f\n", check_time_temp);
-
+/*
     mysql = mysql_init(NULL);           
     if (!mysql) {
         printf("\nMysql init failed.\n");
     }
 
     mysqldb_connect(mysql);
-
+*/
     pthread_mutex_lock(&mutex_row_check);
     data_row_num_init = mysqldb_query_row(mysql, "count(*)", TABLE_NAME1, "1", "1");
 
@@ -37,7 +37,7 @@ void * row_change()
     //printf("check row finish!\n");
     pthread_mutex_unlock(&mutex_row_check);
 
-    close_connection(mysql);
+    //close_connection(mysql);
     
     check_time_temp = get_system_time3f();
     printf("check row finish: %f\n", check_time_temp);

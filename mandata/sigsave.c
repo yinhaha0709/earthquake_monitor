@@ -15,7 +15,7 @@ void * signal_save(void * arg)
     int data_row_num = 0;    
     double **d = allocation_memory_double(50, 7);
     char message[200] = {0};
-    MYSQL *mysql;
+    //MYSQL *mysql;
 
     runtime = get_system_time3f();
     printf("data save pthread start time: %f\n", runtime);
@@ -38,14 +38,14 @@ void * signal_save(void * arg)
     printf("copy data ok\n");
     pthread_mutex_unlock(&mutex);
     //printf("mutex data ok\n");
-
+/*
     mysql = mysql_init(NULL); 
     if (!mysql) {
         printf("\nMysql init failed.\n");
     }
 
     mysqldb_connect(mysql);
-
+*/
     for(m=0; m<50; m++)
     {
 	    sprintf(message, "%f, %f, %f, %f, %f, %f, %f", d[m][0], d[m][1], d[m][2], d[m][3], d[m][4], d[m][5], d[m][6]);
@@ -53,7 +53,7 @@ void * signal_save(void * arg)
 	    memset(message, 0, sizeof(message));
     }
 
-    close_connection(mysql);
+    //close_connection(mysql);
 
     runtime = get_system_time3f();
     printf("data save pthread finish time: %f\n", runtime);

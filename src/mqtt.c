@@ -13,6 +13,7 @@
 //int running;
 int running, ontime_status, ftp_status, ontime_block_num;
 int fd_watchdog;
+//static unsigned char food = 0;
 
 struct mosquitto *mosq = NULL;
 struct mosquitto *mosq1 = NULL;
@@ -337,6 +338,7 @@ void vibration_subcribe(char *topic, int qos)
 void vibration_publish_callback(struct mosquitto *mosq1, void *obj, int mid)
 {
     printf("publish finish\n");
+    //ssize_t eaten = write(fd_watchdog, &food, 1);
 }
 
 void vibration_message_callback(struct mosquitto *mosq1, void *obj, const struct mosquitto_message *msg)

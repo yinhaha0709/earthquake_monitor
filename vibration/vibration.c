@@ -35,6 +35,7 @@ short int simple_rate, simple_num;
 char position_num[2], station_num[2];
 char topic_regpub[30], topic_regsub[33], topic_feature[29], topic_ontimepub[28], topic_ontimesub[31], topic_event[27];
 char threshold_status[6];
+MYSQL *mysql;
 
 union union_change
 {
@@ -54,7 +55,7 @@ int main(void)
     float sig_V[6];
     double sys_time, time_temp1, time_temp2, time_temp3, time_temp4;
     union union_change U1;
-    MYSQL *mysql1;
+    //MYSQL *mysql1;
     static unsigned char food = 0;
 
     fd_watchdog = open("/dev/watchdog", O_WRONLY);
@@ -64,18 +65,18 @@ int main(void)
         syslog(LOG_WARNING, "FAILED to open /dev/watchdog, errno: %d\n", err);
     }
 
-    mysql1 = mysql_init(NULL); 
-    if (!mysql1) {
+    mysql = mysql_init(NULL); 
+    if (!mysql) {
         printf("\nMysql init failed.\n");
     }
 
-    mysqldb_connect(mysql1);
+    mysqldb_connect(mysql);
 
-    ontime_status = mysqldb_query_row(mysql1, MESSAGE_INT, TABLE_NAME2, "id", "1");
-    ftp_status = mysqldb_query_row(mysql1, MESSAGE_INT, TABLE_NAME2, "id", "2");
+    ontime_status = mysqldb_query_row(mysql, MESSAGE_INT, TABLE_NAME2, "id", "1");
+    ftp_status = mysqldb_query_row(mysql, MESSAGE_INT, TABLE_NAME2, "id", "2");
 
     printf("%d, %d\n", ontime_status, ftp_status);
-    close_connection(mysql1);
+    //close_connection(mysql1);
 
     running = 0, ontime_block_num = 0;
     for(i=0; i<6; i++)
@@ -144,6 +145,7 @@ int main(void)
     while(1){
         if(row_count >= 350){
             row_count = 0;
+            printf("signal_save start\n");
             pthread_create(&id_t1, NULL, signal_save, (void*)&c);
 
             if(ontime_status == 1){
@@ -164,13 +166,14 @@ int main(void)
 
         if((sys_time - time_temp4) >= 30.0){
             //mosquitto_reconnect(mosq1);
+            ssize_t eaten = write(fd_watchdog, &food, 1);
             pthread_create(&id_t4, NULL, id_change, NULL);
             time_temp4 = sys_time;
         }
 
     	if((count = read(fd, i_data, 200)) > 0){
             if((i_data[0] == 0x70) && (i_data[1] == 0x03) && (i_data[2] == 0x18)){
-                ssize_t eaten = write(fd_watchdog, &food, 1);
+                //ssize_t eaten = write(fd_watchdog, &food, 1);
                 if((crc_check = calc_crc16(i_data, count)) == 0){
 
                     sys_time = get_system_time3f();

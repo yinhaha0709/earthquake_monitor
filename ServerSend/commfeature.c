@@ -20,20 +20,20 @@ char message1[100], message2[100], message3[100];
 void * feature_change(void * arg)
 {
     //pthread_mutex_t mutex_change;
-    MYSQL *mysql;
+    //MYSQL *mysql;
     int row = 0;
     int row_temp;
     int x, y;
     char *table_name = (char *)arg;
 
     printf("%s\n", table_name);
-
+/*
     mysql = mysql_init(NULL);
     if (!mysql) {
         printf("\nMysql init failed.\n");
     }
     mysqldb_connect(mysql);
-
+*/
     if(strcmp(table_name, TABLE_NAME3) == 0){
         double min_array[6][30];
 
@@ -204,7 +204,7 @@ void * feature_change(void * arg)
         pthread_mutex_unlock(&mutex_ave);
     }
 
-    close_connection(mysql);
+    //close_connection(mysql);
 }
 
 void * feature_send(void * arg)
@@ -264,7 +264,7 @@ void * feature_send(void * arg)
 
 void * common_feature()
 {
-    MYSQL *mysql;
+    //MYSQL *mysql;
     double e[6][200], max[6], min[6],  ave[6], time_temp4;
     int row = 0, i = 0, row_send = 0;
     float nominal;
@@ -280,14 +280,14 @@ void * common_feature()
 
     time_temp4 = get_system_time3f();
     printf("\ndata cal start time: %f\n", time_temp4);
-
+/*
     //pthread_mutex_lock(&mutex_cal);
     mysql = mysql_init(NULL);
     if (!mysql) {
         printf("\nMysql init failed.\n");
     }
     mysqldb_connect(mysql);
-
+*/
     mysqldb_query(mysql, "value1, value2, value3, value4, value5, value6", TABLE_NAME1, "1", "1 order by timestrap desc limit 200");
 
     for(row=0; row<6; row++)
@@ -362,7 +362,7 @@ ave_value6_3s, ave_value6_60s, ave_ratio6, sensor_status6");
         mysqldb_delete(mysql, TABLE_NAME6, "timestrap asc", row_send-300);
     
     pthread_mutex_unlock(&mutex_cal);
-    close_connection(mysql);
+    //close_connection(mysql);
 
     time_temp4 = get_system_time3f();
     printf("\ndata cal finish time: %f\n", time_temp4);
