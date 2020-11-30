@@ -11,6 +11,7 @@
 void * row_change()
 {
     //MYSQL *mysql;
+    MYSQL *mysql_row;
     int data_row_num_init = 0, data_row_to_delete = 0;
 
     double check_time_temp = get_system_time3f();
@@ -23,12 +24,20 @@ void * row_change()
 
     mysqldb_connect(mysql);
 */
+
+    mysql_row = mysql_init(NULL);           
+    if (!mysql_row) {
+        printf("\nMysql init failed.\n");
+    }
+
+    mysqldb_connect(mysql_row);   
+
     pthread_mutex_lock(&mutex_row_check);
-    data_row_num_init = mysqldb_query_row(mysql, "count(*)", TABLE_NAME1, "1", "1");
+    data_row_num_init = mysqldb_query_row(mysql_row, "count(*)", TABLE_NAME1, "1", "1");
 
     if((data_row_num_init - 24000) > 0){
         data_row_to_delete = data_row_num_init - 24000;
-        mysqldb_delete(mysql, TABLE_NAME1, "timestrap asc", data_row_to_delete);
+        mysqldb_delete(mysql_row, TABLE_NAME1, "timestrap asc", data_row_to_delete);
         //data_row_num_init = 24000;
     }
     printf("\n%d\n", data_row_num_init);
@@ -37,8 +46,11 @@ void * row_change()
     //printf("check row finish!\n");
     pthread_mutex_unlock(&mutex_row_check);
 
-    //close_connection(mysql);
+    close_connection(mysql_row);
+    //mysql_library_end();
     
     check_time_temp = get_system_time3f();
     printf("check row finish: %f\n", check_time_temp);
+
+    pthread_detach(pthread_self());
 }

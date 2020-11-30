@@ -84,7 +84,7 @@ extern pthread_mutex_t mutex, mutex_row_check, mutex_cal, mutex_min, mutex_max, 
 extern struct mosquitto *mosq;
 extern struct mosquitto *mosq1;
 
-extern MYSQL *mysql;
+//extern MYSQL *mysql_sig, *mysql_id, *mysql_row, *mysql_common, *mysql_min, *mysql_max, *mysql_ave;
 
 extern char station_id[8], mode, version;
 extern float longitude, latitude, strain, acceleration;
@@ -98,5 +98,9 @@ extern int ontime_block_num;
 extern char topic_regpub[30], topic_regsub[33], topic_feature[29], topic_ontimepub[28], topic_ontimesub[31], topic_event[27];
 
 extern int fd_watchdog;
+
+extern int earthquake_status;
+
+extern float sig_max;
 
 #endif

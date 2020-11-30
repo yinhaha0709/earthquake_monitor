@@ -415,6 +415,7 @@ void vibration_message_callback(struct mosquitto *mosq1, void *obj, const struct
                 }
 
                 close_connection(mysql);
+                //mysql_library_end();
             }
             else if (OntimeSub_temp.ctrl_command == 2)
             {
@@ -442,6 +443,7 @@ void vibration_message_callback(struct mosquitto *mosq1, void *obj, const struct
                 }
 
                 close_connection(mysql);
+                //mysql_library_end();
             }
             else if (OntimeSub_temp.ctrl_command == 3)
             {

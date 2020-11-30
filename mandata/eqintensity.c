@@ -1,25 +1,29 @@
 #include <stdio.h>
+#include <math.h>
 #include "../include/eqintensity.h"
+#include "../include/config.h"
+#include "../include/searchmax.h"
 
-int earthquake_intensity(double peakAcc)
+void earthquake_intensity(double a[], int n)
 {
-    int Y = 1000 * peakAcc;
-    int L = 0;
+    int i;
 
-    if(Y >= 20 && Y <= 25)
-        L = 4;
-    else if(Y > 25 && Y <=50)
-        L = 5;
-    else if(Y > 50 && Y <= 100)
-        L = 6;
-    else if(Y > 100 && Y <= 200)
-        L = 7;
-    else if(Y > 200 && Y <=350)
-        L = 8;
-    else if(Y > 350)
-        L = 9;
-    else
-        L = 0;
+    double b[n];
+    
+    double max_temp = 0;
+    
+    for(i=0; i<n; i++)
+    {
+        b[i] = fabs(a[i]);
+    }
 
-    return L;
+    max_temp = search_max(b, n);
+
+    if((float)max_temp > sig_max){
+        sig_max = (float)max_temp;
+    }
+
+    if(sig_max >= 0.020){
+        earthquake_status = 1;
+    }
 }

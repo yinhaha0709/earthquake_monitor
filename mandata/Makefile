@@ -3,7 +3,7 @@ lib = ../lib
 src = ../src
 man = ../mandata
 
-targets_man = $(lib)/checkrow.o $(lib)/datacharacteric.o $(lib)/eqintensity.o $(lib)/savdata.o $(lib)/stationreg.o $(lib)/rowchange.o $(lib)/sigsave.o $(lib)/idchange.o
+targets_man = $(lib)/checkrow.o $(lib)/datacharacteric.o $(lib)/savdata.o $(lib)/stationreg.o $(lib)/rowchange.o $(lib)/sigsave.o $(lib)/idchange.o
 
 all: $(targets_man)
 
@@ -17,9 +17,6 @@ $(lib)/checkrow.o: $(man)/checkrow.c $(inc)/config.h $(inc)/checkrow.h $(inc)/da
 $(lib)/datacharacteric.o: $(man)/datacharacteric.c $(inc)/config.h $(inc)/database.h $(inc)/searchmin.h \
 			$(inc)/searchmax.h $(inc)/searchaverage.h $(inc)/datacharacteric.h $(inc)/systime.h $(inc)/generalSend.h
 	cc -o $(lib)/datacharacteric.o -c $(man)/datacharacteric.c -lmysqlclient -D_REENTRANT -lpthread
-
-$(lib)/eqintensity.o: $(man)/eqintensity.c $(inc)/eqintensity.h
-	cc -o $(lib)/eqintensity.o -c $(man)/eqintensity.c
 
 $(lib)/savdata.o: $(man)/savdata.c $(inc)/config.h $(inc)/savdata.h $(inc)/database.h $(inc)/systime.h $(inc)/arrayop.h
 	cc -o $(lib)/savdata.o -c $(man)/savdata.c -lmysqlclient -lpthread

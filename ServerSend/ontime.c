@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <pthread.h>
 #include <string.h>
 #include "../include/config.h"
 #include "../include/mqtt.h"
@@ -80,4 +81,6 @@ void * ontime_send(void * arg)
     printf("ontime send ok\n");
 
     vibration_publish(topic_ontimepub, payload, ontime_long);
+
+    pthread_detach(pthread_self());
 }

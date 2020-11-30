@@ -8,13 +8,16 @@
 #include "../include/arrayop.h"
 #include "../include/sigsave.h"
 
+
 void * signal_save(void * arg)
 {
     double runtime;
     int m = 0;
     int data_row_num = 0;    
     double **d = allocation_memory_double(50, 7);
+    //double d[50][7];
     char message[200] = {0};
+    MYSQL *mysql_sig;
     //MYSQL *mysql;
 
     runtime = get_system_time3f();
@@ -46,16 +49,28 @@ void * signal_save(void * arg)
 
     mysqldb_connect(mysql);
 */
+    mysql_sig = mysql_init(NULL); 
+    if (!mysql_sig) {
+        printf("\nMysql init failed.\n");
+    }
+
+    mysqldb_connect(mysql_sig);
+
     for(m=0; m<50; m++)
     {
 	    sprintf(message, "%f, %f, %f, %f, %f, %f, %f", d[m][0], d[m][1], d[m][2], d[m][3], d[m][4], d[m][5], d[m][6]);
-        mysqldb_insert(mysql, TABLE_NAME1, "timestrap, value1, value2, value3, value4, value5, value6", message);
+        mysqldb_insert(mysql_sig, TABLE_NAME1, "timestrap, value1, value2, value3, value4, value5, value6", message);
 	    memset(message, 0, sizeof(message));
     }
 
-    //close_connection(mysql);
+    close_connection(mysql_sig);
+    //mysql_library_end();
+
+    free_memory_double(d, 50);
 
     runtime = get_system_time3f();
     printf("data save pthread finish time: %f\n", runtime);
+
+    pthread_detach(pthread_self());
 
 }
