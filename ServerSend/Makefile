@@ -4,7 +4,7 @@ src = ../src
 man = ../mandata
 server = ../ServerSend
 
-targets_server = $(lib)/infoinit.o $(lib)/register.o $(lib)/commfeature.o $(lib)/ontime.o
+targets_server = $(lib)/infoinit.o $(lib)/register.o $(lib)/commfeature.o $(lib)/ontime.o $(lib)/event.o
 
 all: $(targets_server)
 
@@ -21,6 +21,9 @@ $(lib)/commfeature.o: $(server)/commfeature.c $(inc)/config.h $(inc)/database.h 
 
 $(lib)/ontime.o: $(server)/ontime.c $(inc)/config.h $(inc)/mqtt.h $(inc)/systime.h $(inc)/ontime.h
 	cc -o $(lib)/ontime.o -c $(server)/ontime.c -D_REENTRANT -lpthread
+
+$(lib)/event.o: $(server)/event.c $(inc)/config.h $(inc)/event.h $(inc)/mqtt.h $(inc)/database.h
+	cc -o $(lib)/event.o -c $(server)/event.c -D_REENTRANT -lm -lmysqlclient -lpthread
 
 include $(man)/Makefile
 

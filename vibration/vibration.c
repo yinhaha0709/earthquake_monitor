@@ -25,16 +25,17 @@
 #include "../include/register.h"
 #include "../include/idchange.h"
 #include "../include/ontime.h"
+#include "../include/eqintensity.h"
+#include "../include/event.h"
 
 pthread_mutex_t mutex, mutex_row_check, mutex_cal, mutex_min, mutex_max, mutex_ave;
-float sig_g[6];
-double timestrap;
+double sig_g[6];
+double sys_time;
 char station_id[8], mode, version;
 float longitude, latitude, strain, acceleration;
 short int simple_rate, simple_num;
 char position_num[2], station_num[2];
 char topic_regpub[30], topic_regsub[33], topic_feature[29], topic_ontimepub[28], topic_ontimesub[31], topic_event[27];
-char threshold_status[6];
 
 union union_change
 {
@@ -45,14 +46,14 @@ union union_change
 int main(void)
 {
     int fd;
-    pthread_t id_t1, id_t2, id_t3, id_t4, id_t5;
+    pthread_t id_t1, id_t2, id_t3, id_t4, id_t5, id_t6;
     struct termios old_cfg, new_cfg;
     int speed;
     int count, row_count, crc_check;
     int i, j, k;
     uint8_t i_data[200];
     float sig_V[6];
-    double sys_time, time_temp1, time_temp2, time_temp3, time_temp4;
+    double time_temp1, time_temp2, time_temp3, time_temp4, time_temp5, time_gap_temp;
     union union_change U1;
     MYSQL *mysql1;
     static unsigned char food = 0;
@@ -77,6 +78,7 @@ int main(void)
 
     ontime_status = mysqldb_query_row(mysql1, MESSAGE_INT, TABLE_NAME2, "id", "1");
     ftp_status = mysqldb_query_row(mysql1, MESSAGE_INT, TABLE_NAME2, "id", "2");
+    event_num = mysqldb_query_row(mysql1, MESSAGE_INT, TABLE_NAME2, "id", "3");
 
     printf("%d, %d\n", ontime_status, ftp_status);
     close_connection(mysql1);
@@ -150,9 +152,23 @@ int main(void)
     time_temp2 = time_temp1 + 0.5;
     time_temp3 = time_temp1 + 5;
     time_temp4 = time_temp1 + 7.5;
+    time_temp5 = time_temp1;
 
     while (1)
     {
+        if((earthquake_status == 1) && ((time_gap_temp = (sys_time - time_temp5)) >=2.0))
+        {
+            pthread_create(&id_t6, NULL, earthquake_event, NULL);
+            time_temp5 = sys_time;
+        }
+        else if((earthquake_status == 0) && (event_status > 0) && (time_gap_temp >= 2.0))
+        {
+            event_status = event_status - 2;
+            if(event_status <= 0){
+                pthread_create(&id_t6, NULL, earthquake_end, NULL);
+            }
+        }
+
         if (row_count >= 350)
         {
             row_count = 0;
@@ -214,6 +230,8 @@ int main(void)
                     sig_g[3] = (sig_V[3] - 2.5773) / 1.2788;
                     sig_g[4] = (sig_V[4] - 2.5880) / 1.2821;
                     sig_g[5] = ((sig_V[5] - 2.6043) / 1.2944) + 1.0;
+
+                    earthquake_intensity(sig_g, 6);
 
                     c[row_count] = sys_time;
                     row_count++;

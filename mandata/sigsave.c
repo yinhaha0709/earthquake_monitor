@@ -14,8 +14,8 @@ void * signal_save(void * arg)
     double runtime;
     int m = 0;
     int data_row_num = 0;    
-    double **d = allocation_memory_double(50, 7);
-    //double d[50][7];
+    //double **d = allocation_memory_double(50, 7);
+    double d[50][7];
     char message[200] = {0};
     MYSQL *mysql_sig;
     //MYSQL *mysql;
@@ -66,7 +66,7 @@ void * signal_save(void * arg)
     close_connection(mysql_sig);
     //mysql_library_end();
 
-    free_memory_double(d, 50);
+    //free_memory_double(d, 50);
 
     runtime = get_system_time3f();
     printf("data save pthread finish time: %f\n", runtime);

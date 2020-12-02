@@ -1,29 +1,47 @@
 #include <stdio.h>
-#include <math.h>
+//#include <math.h>
 #include "../include/eqintensity.h"
 #include "../include/config.h"
 #include "../include/searchmax.h"
+#include "../include/searchmin.h"
+
+float sig_max, sig_min;
 
 void earthquake_intensity(double a[], int n)
 {
     int i;
+    //double b[n];
+    float max_temp, min_temp;
 
-    double b[n];
-    
-    double max_temp = 0;
-    
-    for(i=0; i<n; i++)
+    for (i = 0; i < n; i++)
     {
-        b[i] = fabs(a[i]);
+        //b[i] = fabs(a[i]);
+        if ((a[i] >= 0.020) || (a[i] <= -0.020))
+        {
+            threshold_status[i] = 1;
+            earthquake_status = 1;
+        }
     }
 
-    max_temp = search_max(b, n);
+    if (earthquake_status == 1)
+    {
+        max_temp = (float)search_max(a, n);
+        min_temp = (float)search_min(a, n);
 
-    if((float)max_temp > sig_max){
-        sig_max = (float)max_temp;
-    }
+        if (max_temp > sig_max)
+        {
+            sig_max = max_temp;
+        }
 
-    if(sig_max >= 0.020){
-        earthquake_status = 1;
+        if (min_temp < sig_min)
+        {
+            sig_min = min_temp;
+        }
+
+        if (event_status <= 0)
+        {
+            event_start_time = sys_time;
+            event_status = 16;
+        }
     }
 }

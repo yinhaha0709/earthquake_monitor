@@ -70,7 +70,7 @@ extern double max_check_array[6][30];
 extern double ave_check_array[6][60];
 extern double data_check_array[6][200];
 
-extern float sig_g[6];
+extern double sig_g[6];
 
 extern float min_1s[6], max_1s[6], min_5s[6], max_5s[6], min_30s[6], max_30s[6], ave_3s[6], ave_60s[6], ave_ratio[6];
 extern float sensor_status[6];
@@ -92,15 +92,19 @@ extern char position_num[2], station_num[2];
 extern char threshold_status[6];
 
 extern short int simple_rate, simple_num;
-extern int running, ontime_status, ftp_status;
+extern int running, ontime_status, ftp_status, event_num;
 extern int ontime_block_num;
 
 extern char topic_regpub[30], topic_regsub[33], topic_feature[29], topic_ontimepub[28], topic_ontimesub[31], topic_event[27];
 
 extern int fd_watchdog;
 
-extern int earthquake_status;
+extern int earthquake_status, event_status;
 
-extern float sig_max;
+extern float sig_max, sig_min, earthquake_max, earthquake_min, earthquake_range;
+
+extern double event_start_time, event_time;
+
+extern double sys_time;
 
 #endif

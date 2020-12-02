@@ -205,7 +205,7 @@ void *feature_change(void *arg)
         {
             for (x = 0; x < 6; x++)
             {
-                ave_3s[x] = search_average(ave_array[x], row);
+                ave_3s[x] = search_abs_average(ave_array[x], row);
                 ave_60s[x] = ave_3s[x];
             }
         }
@@ -213,16 +213,16 @@ void *feature_change(void *arg)
         {
             for (x = 0; x < 6; x++)
             {
-                ave_3s[x] = search_average(ave_array[x], 3);
-                ave_60s[x] = search_average(ave_array[x], row);
+                ave_3s[x] = search_abs_average(ave_array[x], 3);
+                ave_60s[x] = search_abs_average(ave_array[x], row);
             }
         }
         else if (row >= 60)
         {
             for (x = 0; x < 6; x++)
             {
-                ave_3s[x] = search_average(ave_array[x], 3);
-                ave_60s[x] = search_average(ave_array[x], 60);
+                ave_3s[x] = search_abs_average(ave_array[x], 3);
+                ave_60s[x] = search_abs_average(ave_array[x], 60);
             }
         }
 
@@ -347,7 +347,7 @@ void *common_feature()
     {
         max[row] = search_max(e[row], 200);
         min[row] = search_min(e[row], 200);
-        ave[row] = search_average(e[row], 200);
+        ave[row] = search_abs_average(e[row], 200);
         if (row < 3)
             nominal = acceleration;
         else

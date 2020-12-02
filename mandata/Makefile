@@ -3,7 +3,7 @@ lib = ../lib
 src = ../src
 man = ../mandata
 
-targets_man = $(lib)/checkrow.o $(lib)/datacharacteric.o $(lib)/savdata.o $(lib)/stationreg.o $(lib)/rowchange.o $(lib)/sigsave.o $(lib)/idchange.o
+targets_man = $(lib)/checkrow.o $(lib)/datacharacteric.o $(lib)/savdata.o $(lib)/stationreg.o $(lib)/rowchange.o $(lib)/sigsave.o $(lib)/idchange.o $(lib)/eqintensity.o
 
 all: $(targets_man)
 
@@ -32,6 +32,9 @@ $(lib)/sigsave.o: $(man)/sigsave.c $(inc)/config.h $(inc)/sigsave.h $(inc)/datab
 
 $(lib)/idchange.o: $(man)/idchange.c $(inc)/config.h $(inc)/database.h $(inc)/systime.h $(inc)/idchange.h
 	cc -o $(lib)/idchange.o -c $(man)/idchange.c -lmysqlclient -lpthread
+
+$(lib)/eqintensity.o: $(man)/eqintensity.c $(inc)/eqintensity.h $(inc)/config.h $(inc)/searchmax.h $(inc)/searchmin.h
+	cc -o $(lib)/eqintensity.o -c $(man)/eqintensity.c
 
 .PHONY: clean
 clean:

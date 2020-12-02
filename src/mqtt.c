@@ -13,6 +13,7 @@
 //int running;
 int running, ontime_status, ftp_status, ontime_block_num;
 int fd_watchdog;
+char threshold_status[6];
 //static unsigned char food = 0;
 
 struct mosquitto *mosq = NULL;
@@ -412,6 +413,10 @@ void vibration_message_callback(struct mosquitto *mosq1, void *obj, const struct
                     ontime_status = 1;
                     mysqldb_update(mysql, MESSAGE_INT, ontime_status, 1);
                     //printf("status1-1\n");
+                    for (i = 0; i < 6; i++)
+                    {
+                        threshold_status[i] = 0;
+                    }
                 }
 
                 close_connection(mysql);

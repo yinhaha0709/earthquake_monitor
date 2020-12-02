@@ -9,7 +9,7 @@ server = ../ServerSend
 
 objects_Aliyun = $(lib)/vibrationAliyun.o $(lib)/systime.o $(lib)/checkrow.o $(lib)/datacharacteric.o $(lib)/savdata.o $(lib)/Crc16.o $(lib)/arrayop.o $(lib)/database.o $(lib)/searchaverage.o $(lib)/searchmax.o $(lib)/searchmin.o $(lib)/ontimeSend.o $(lib)/cJSON.o $(lib)/mqtt.o $(lib)/registerSend.o $(lib)/generalSend.o
 
-objects_Server = $(lib)/vibration.o $(lib)/systime.o $(lib)/rowchange.o $(lib)/sigsave.o $(lib)/commfeature.o $(lib)/Crc16.o $(lib)/arrayop.o $(lib)/database.o $(lib)/searchaverage.o $(lib)/searchmax.o $(lib)/searchmin.o $(lib)/getstatus.o $(lib)/mqtt.o $(lib)/infoinit.o $(lib)/register.o $(lib)/cJSON.o $(lib)/idchange.o $(lib)/ontime.o
+objects_Server = $(lib)/vibration.o $(lib)/systime.o $(lib)/rowchange.o $(lib)/sigsave.o $(lib)/commfeature.o $(lib)/Crc16.o $(lib)/arrayop.o $(lib)/database.o $(lib)/searchaverage.o $(lib)/searchmax.o $(lib)/searchmin.o $(lib)/getstatus.o $(lib)/mqtt.o $(lib)/infoinit.o $(lib)/register.o $(lib)/cJSON.o $(lib)/idchange.o $(lib)/ontime.o $(lib)/eqintensity.o $(lib)/event.o
 
 target_vibration = $(bin)/vibrationAliyun $(bin)/vibration
 
@@ -26,7 +26,7 @@ $(bin)/vibration: $(objects_Server)
 $(lib)/vibrationAliyun.o: $(vib)/vibrationAliyun.c $(inc)/systime.h $(inc)/config.h $(inc)/savdata.h $(inc)/checkrow.h $(inc)/datacharacteric.h $(inc)/mqtt.h $(inc)/Crc16.h $(inc)/registerSend.h $(inc)/ontimeSend.h
 	cc -o $(lib)/vibrationAliyun.o -D_REENTRANT -lmysqlclient -lpthread -c $(vib)/vibrationAliyun.c
 
-$(lib)/vibration.o: $(vib)/vibration.c $(inc)/config.h $(inc)/systime.h $(inc)/sigsave.h $(inc)/rowchange.h $(inc)/commfeature.h $(inc)/mqtt.h $(inc)/Crc16.h $(inc)/infoinit.h $(inc)/register.h $(inc)/idchange.h $(inc)/database.h
+$(lib)/vibration.o: $(vib)/vibration.c $(inc)/config.h $(inc)/systime.h $(inc)/sigsave.h $(inc)/rowchange.h $(inc)/commfeature.h $(inc)/mqtt.h $(inc)/Crc16.h $(inc)/infoinit.h $(inc)/register.h $(inc)/idchange.h $(inc)/database.h $(inc)/ontime.h $(inc)/eqintensity.h $(inc)/event.h
 	cc -o $(lib)/vibration.o -D_REENTRANT -lmysqlclient -lpthread -c $(vib)/vibration.c
 
 include $(aliyun)/Makefile

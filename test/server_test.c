@@ -6,6 +6,17 @@
 #include "../include/config.h"
 #include "../include/mqtt.h"
 #include "../include/infoinit.h"
+//#include "../include/infoinit.h"
+
+pthread_mutex_t mutex, mutex_row_check, mutex_cal, mutex_min, mutex_max, mutex_ave;
+double sig_g[6];
+double sys_time;
+char station_id[8], mode, version;
+float longitude, latitude, strain, acceleration;
+short int simple_rate, simple_num;
+char position_num[2], station_num[2];
+char topic_regpub[30], topic_regsub[33], topic_feature[29], topic_ontimepub[28], topic_ontimesub[31], topic_event[27];
+char threshold_status[6];
 
 typedef struct VibtationReg_T
 {
@@ -79,88 +90,7 @@ int main(void)
     VibtationReg_t Reg_temp;
     //union union_change U1;
 
-    memset(str, 0, 30);
-    memset(temp, 0, 8);
-    memset(&version, 0, 1);
-    memset(&mode, 0, 1);
 
-    fp = fopen("../data/station_message.txt", "r");
-    if (fp == NULL)
-    {
-        printf("fail to open reg file!\n");
-        return 0;
-    }
-
-    while ((ch = fgetc(fp)) != EOF && ch != '\377')
-    {
-        if (ch == '\n')
-        {
-            copy_status = 0;
-
-            switch (i)
-            {
-            case 0:
-                strncpy(station_id, str, j);
-                printf("%s\n", station_id);
-                memset(str, 0, 30);
-                break;
-            case 1:
-                strncpy(temp, str, j);
-                longitude = atof(temp);
-                memset(str, 0, 30);
-                printf("%s\n%f\n", temp, longitude);
-                memset(temp, 0, 8);
-                break;
-            case 2:
-                strncpy(temp, str, j);
-                latitude = atof(temp);
-                memset(str, 0, 30);
-                printf("%s\n%f\n", temp, latitude);
-                memset(temp, 0, 8);
-                break;
-            case 3:
-                strncpy(temp, str, j);
-                strain = atof(temp);
-                memset(str, 0, 30);
-                printf("%s\n%f\n", temp, strain);
-                memset(temp, 0, 8);
-                break;
-            case 4:
-                strncpy(temp, str, j);
-                acceleration = atof(temp);
-                memset(str, 0, 30);
-                printf("%s\n%f\n", temp, acceleration);
-                memset(temp, 0, 8);
-                break;
-            case 5:
-                strncpy(&mode, str, j);
-                mode = mode -'0';
-                memset(str, 0, 30);
-                break;
-            case 6:
-                strncpy(&version, str, j);
-                version = version - '0';
-                memset(str, 0, 30);
-                break;
-            default:
-                break;
-            }
-
-            j = 0;
-            i++;
-        }
-
-        if (copy_status == 1)
-        {
-            str[j] = ch;
-            j++;
-        }
-
-        if (ch == ' ')
-            copy_status = 1;
-    }
-
-    fclose(fp);
 
     strcpy(Reg_temp.type_temp, "re");
     printf("%x %x\n", Reg_temp.type_temp[0], Reg_temp.type_temp[1]);

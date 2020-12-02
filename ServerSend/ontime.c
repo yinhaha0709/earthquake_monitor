@@ -72,6 +72,11 @@ void * ontime_send(void * arg)
 
         j = j + 209;
     }
+
+    for(i=0; i<6; i++)
+    {
+        threshold_status[i] = 0;
+    }
 /*
     for(i=0; i<ontime_long; i++)
     {

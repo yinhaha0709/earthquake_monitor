@@ -63,9 +63,13 @@ mysql -u${USER} -p${PASSWORD} -D${DATABASE} -e"${create_table6_sql}"
 #insert data
 insert1_sql="INSERT INTO ${TABLE2} (id, message_introduction, message_int_content, message_double_content) VALUES (1, 'ontime_status', 0, 0)"
 insert2_sql="INSERT INTO ${TABLE2} (id, message_introduction, message_int_content, message_double_content) VALUES (2, 'ftp_status', 1, 0)"
+insert3_sql="INSERT INTO ${TABLE2} (id, message_introduction, message_int_content, message_double_content) VALUES (3, 'event_num', 16, 0)"
 
 mysql -u${USER} -p${PASSWORD} -D${DATABASE} -e"${insert1_sql}"
 [ $? -eq 0 ]&& echo "data1 insert success" || echo "data1 already exist"
 
 mysql -u${USER} -p${PASSWORD} -D${DATABASE} -e"${insert2_sql}"
 [ $? -eq 0 ]&& echo "data2 insert success" || echo "data2 already exist"
+
+mysql -u${USER} -p${PASSWORD} -D${DATABASE} -e"${insert3_sql}"
+[ $? -eq 0 ]&& echo "data3 insert success" || echo "data3 already exist"
