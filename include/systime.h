@@ -4,5 +4,6 @@
 double get_system_time();
 double get_system_time1f();
 double get_system_time3f();
+void get_date_time();
 
 #endif

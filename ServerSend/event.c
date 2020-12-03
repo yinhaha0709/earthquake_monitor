@@ -93,7 +93,7 @@ void *earthquake_event()
 void *earthquake_end()
 {
     char type[2] = "ti";
-    char payload[39];
+    char payload[39], csv_name[SHORT_BUF_SIZE], script_send[SHORT_BUF_SIZE], data_name_change[SHORT_BUF_SIZE];
     int event_long = 39;
     int i;
     MYSQL *mysql_event_end;
@@ -118,6 +118,13 @@ void *earthquake_end()
     }
 
     vibration_publish(topic_event, payload, event_long);
+
+    sprintf(csv_name, "Burst_%02d%02d%02d%02d%02d%02d_%.3f_%.3f.csv", eq_year, eq_month, eq_day, eq_hour, eq_min, eq_sec, earthquake_max * 1000, earthquake_min * 1000);
+    sprintf(data_name_change, "%s/%s", DATA_DIR, csv_name);
+    sprintf(script_send, "./%s/ftp_send.sh %s &", FTP_SEND_DIR, csv_name);
+
+    rename("../data/temp.csv", data_name_change);
+    system(script_send);
 
     earthquake_max = -5.0;
     earthquake_min = 5.0;

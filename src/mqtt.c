@@ -305,9 +305,6 @@ void vibration_publish(char *topic, uint8_t *payload, int byte_size)
     else
     {
         printf("publish qos1 start!\n\n");
-        ///////////////////////////////////////////
-
-        ///////////////////////////////////////////
     }
 }
 
@@ -338,6 +335,12 @@ void vibration_subcribe(char *topic, int qos)
 
 void vibration_publish_callback(struct mosquitto *mosq1, void *obj, int mid)
 {
+/*
+    if (write(fd, o_data, 8) != 1)
+    {
+        puts("\n!!!FAILED feeding watchdog");
+    }
+*/
     printf("publish finish\n");
     //ssize_t eaten = write(fd_watchdog, &food, 1);
 }

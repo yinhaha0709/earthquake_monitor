@@ -63,12 +63,16 @@
 #define DATA_PORT "/dev/signal_port"
 #define NET_PORT "/dev/net_port"
 
+#define FTP_SEND_DIR "../ftp_send"
+#define DATA_DIR "../data"
+
 //#include <pthread.h>
 
 extern double min_check_array[6][30];
 extern double max_check_array[6][30];
 extern double ave_check_array[6][60];
 extern double data_check_array[6][200];
+extern double csv_save_array[6][3000];
 
 extern double sig_g[6];
 
@@ -97,7 +101,7 @@ extern int ontime_block_num;
 
 extern char topic_regpub[30], topic_regsub[33], topic_feature[29], topic_ontimepub[28], topic_ontimesub[31], topic_event[27];
 
-extern int fd_watchdog;
+extern int fd_watchdog, fd;
 
 extern int earthquake_status, event_status;
 
@@ -106,5 +110,9 @@ extern float sig_max, sig_min, earthquake_max, earthquake_min, earthquake_range;
 extern double event_start_time, event_time;
 
 extern double sys_time;
+
+extern int eq_year, eq_month, eq_day, eq_hour, eq_min, eq_sec;
+
+extern uint8_t o_data[8];
 
 #endif

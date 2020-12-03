@@ -36,6 +36,7 @@ float longitude, latitude, strain, acceleration;
 short int simple_rate, simple_num;
 char position_num[2], station_num[2];
 char topic_regpub[30], topic_regsub[33], topic_feature[29], topic_ontimepub[28], topic_ontimesub[31], topic_event[27];
+int fd;
 
 union union_change
 {

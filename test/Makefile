@@ -4,7 +4,7 @@ lib = ../lib
 test = ../test
 src = ../src
 
-targets_test = $(bin)/test_query $(bin)/mqttpub_test $(bin)/mqttsub_test $(bin)/net_test $(bin)/port_test $(bin)/send_port_test_float $(bin)/send_port_test_hex $(bin)/send_port_test_V $(bin)/mqtt_test $(bin)/server_test $(bin)/hextodouble $(bin)/event_test
+targets_test = $(bin)/test_query $(bin)/mqttpub_test $(bin)/mqttsub_test $(bin)/net_test $(bin)/port_test $(bin)/send_port_test_float $(bin)/send_port_test_hex $(bin)/send_port_test_V $(bin)/mqtt_test $(bin)/server_test $(bin)/hextodouble $(bin)/event_test $(bin)/status_test $(bin)/csv_test
 
 all: $(targets_test)
 
@@ -45,6 +45,12 @@ $(bin)/hextodouble: $(inc)/config.h $(test)/hextodouble.c
 
 $(bin)/event_test: $(inc)/config.h $(inc)/mqtt.h $(inc)/database.h $(inc)/infoinit.h $(inc)/register.h $(inc)/event.h $(test)/event_test.c $(lib)/database.o $(lib)/mqtt.o $(lib)/infoinit.o $(lib)/register.o $(lib)/event.o $(lib)/systime.o
 	cc -g -o $(bin)/event_test $(test)/event_test.c $(lib)/database.o $(lib)/mqtt.o $(lib)/infoinit.o $(lib)/register.o $(lib)/event.o $(lib)/systime.o -lmosquitto -lmysqlclient -D_REENTRANT -lpthread
+
+$(bin)/status_test: $(inc)/getstatus.h $(test)/status_test.c $(lib)/getstatus.o $(lib)/searchmax.o
+	cc -g -O2 -o $(bin)/status_test $(test)/status_test.c $(lib)/getstatus.o $(lib)/searchmax.o -lm
+
+$(bin)/csv_test: $(test)/csv_test.c $(inc)/systime.h $(inc)/config.h $(lib)/systime.o
+	cc -g -o $(bin)/csv_test $(test)/csv_test.c $(lib)/systime.o
 
 include ../AliyunSend/Makefile
 include ../ServerSend/Makefile

@@ -13,6 +13,7 @@ void mysqldb_update(MYSQL *mysql, char *field_name, int value, int id);
 //void mysqldb_update_double(MYSQL *mysql, char *field_name, double value, int id);
 int  mysqldb_query_row(MYSQL *mysql, char *content, char *table_name, char *name, char *value);
 int mysqldb_query(MYSQL *mysql, char *content, char *table_name, char *name, char *value);
+void mysqldb_query_csv(MYSQL *mysql, char *content, char *table_name, char *name, char *value);
 void close_connection(MYSQL *mysql);
 
 #endif

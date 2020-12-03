@@ -5,9 +5,14 @@
     or milliseconds (for sampling)
 */
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <sys/timeb.h>
 #include <sys/types.h>
+#include <time.h>
 #include "../include/systime.h"
+
+int eq_year, eq_month, eq_day, eq_hour, eq_min, eq_sec;
 
 //Get the system time, accurate to seconds
 double get_system_time()
@@ -46,4 +51,21 @@ double get_system_time3f()
     ftime(&nowtime);
     t = (nowtime.time * 1000 + nowtime.millitm)/1000.0;
     return t;
+}
+
+void get_date_time()
+{
+    time_t rawtime;
+    struct tm * timeinfo;
+
+    time(&rawtime);
+    timeinfo = localtime(&rawtime);
+
+    eq_year = timeinfo->tm_year % 100;
+    eq_month = timeinfo->tm_mon + 1;
+    eq_day = timeinfo->tm_mday;
+    eq_hour = timeinfo->tm_hour;
+    eq_min = timeinfo->tm_min;
+    eq_sec = timeinfo->tm_sec;
+
 }

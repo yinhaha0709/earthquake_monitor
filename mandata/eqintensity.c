@@ -1,9 +1,11 @@
 #include <stdio.h>
+#include <pthread.h>
 //#include <math.h>
 #include "../include/eqintensity.h"
 #include "../include/config.h"
 #include "../include/searchmax.h"
 #include "../include/searchmin.h"
+#include "../include/csvstart.h"
 
 float sig_max, sig_min;
 
@@ -12,6 +14,7 @@ void earthquake_intensity(double a[], int n)
     int i;
     //double b[n];
     float max_temp, min_temp;
+    pthread_t id_event;
 
     for (i = 0; i < n; i++)
     {
@@ -40,8 +43,7 @@ void earthquake_intensity(double a[], int n)
 
         if (event_status <= 0)
         {
-            event_start_time = sys_time;
-            event_status = 16;
+            pthread_create(&id_event, NULL, csv_start, NULL);
         }
     }
 }

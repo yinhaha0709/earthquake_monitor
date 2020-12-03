@@ -32,7 +32,14 @@ float get_status(double a[], int num, float nominal)
             return 0;
     }
 
-    if((nominal - search_max(difference, num-1)) < 0.001)
+    double b[num];
+
+    for(i=0; i<num; i++)
+    {
+        b[i] = fabs(a[i]);
+    }
+
+    if((nominal - search_max(b, num)) < 0.001)
         return 1.0;
     else
         return 2.0;

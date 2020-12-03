@@ -6,6 +6,8 @@
 #include "../include/config.h"
 #include "../include/infoinit.h"
 
+uint8_t o_data[8];
+
 void information_init()
 {
     char str[30], temp[8], ch;
@@ -16,6 +18,8 @@ void information_init()
     char topic_head_temp[16];
     simple_rate = (short)SIMPLE_RATE;
     simple_num = (short)SIMPLE_NUM;
+
+    o_data[0] = 0x70, o_data[1] = 0x06, o_data[2] = 0x00, o_data[3] = 0x00, o_data[4] = 0xa5, o_data[5] = 0x5a, o_data[6] = 0x78, o_data[7] = 0x40;
 
     memset(str, 0, 30);
     memset(temp, 0, 8);

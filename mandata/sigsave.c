@@ -38,7 +38,7 @@ void * signal_save(void * arg)
         d[m][6] = ((double*)arg)[m * 7 + 6];
         //printf("%f %f\n", d[m][0], d[m][1]);
     }
-    printf("copy data ok\n");
+    //printf("copy data ok\n");
     pthread_mutex_unlock(&mutex);
     //printf("mutex data ok\n");
 /*
@@ -49,6 +49,17 @@ void * signal_save(void * arg)
 
     mysqldb_connect(mysql);
 */
+    if(earthquake_status == 1)
+    {
+        FILE *fp_csv;
+        fp_csv = fopen("../data/temp.csv", "a+");
+        for(m=0; m<50; m++)
+        {
+            fprintf(fp_csv, "%f\t%f\t%f\t%f\t%f\t%f\n", d[m][1], d[m][2], d[m][3], d[m][4], d[m][5], d[m][6]);
+        }
+        fclose(fp_csv);
+    }
+
     mysql_sig = mysql_init(NULL); 
     if (!mysql_sig) {
         printf("\nMysql init failed.\n");
